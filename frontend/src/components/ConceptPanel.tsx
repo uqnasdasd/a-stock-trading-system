@@ -22,8 +22,8 @@ const ConceptPanel: React.FC = () => {
     try {
       const res = await fetch('/api/concept/hot')
       const json = await res.json()
-      if (json.data) {
-        setConcepts(json.data)
+      if (json.concepts) {
+        setConcepts(json.concepts)
       }
       setLastUpdate(new Date().toLocaleTimeString('zh-CN', { hour12: false }))
     } catch (e) {

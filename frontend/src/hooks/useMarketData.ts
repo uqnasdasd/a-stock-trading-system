@@ -96,7 +96,9 @@ export function useMarketData() {
   // WebSocket连接
   const connectWS = useCallback(() => {
     try {
-      const ws = new WebSocket('ws://localhost:8000/ws')
+      const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+      const wsHost = window.location.host
+      const ws = new WebSocket(`${wsProtocol}//${wsHost}/ws`)
       wsRef.current = ws
 
       ws.onopen = () => {

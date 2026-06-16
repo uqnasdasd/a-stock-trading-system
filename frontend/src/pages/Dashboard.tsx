@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import MarketIndices from '../components/MarketIndices'
 import AuctionPanel from '../components/AuctionPanel'
 import PositionPanel from '../components/PositionPanel'
@@ -14,35 +14,89 @@ import AccountManager from '../components/AccountManager'
 import ConceptPanel from '../components/ConceptPanel'
 import DragonTiger from '../components/DragonTiger'
 import MultiStockCompare from '../components/MultiStockCompare'
+import KlineChart from '../components/KlineChart'
+import MinuteChart from '../components/MinuteChart'
 import { useMarketData } from '../hooks/useMarketData'
+import styles from './Dashboard.module.css'
 
-type TabKey = 'auction' | 'position' | 'signal' | 'limit' | 'watchlist' | 'tradelog' | 'report' | 'backtest' | 'account' | 'concept' | 'dragon' | 'compare'
+/* ====== 导航项定义 ====== */
+type NavKey =
+  | 'overview'
+  | 'auction'
+  | 'position'
+  | 'signal'
+  | 'limit'
+  | 'watchlist'
+  | 'kline'
+  | 'tradelog'
+  | 'risk'
+  | 'settings'
 
-const TAB_ORDER: TabKey[] = ['auction', 'position', 'signal', 'limit', 'watchlist', 'concept', 'dragon', 'compare', 'tradelog', 'report', 'backtest', 'account']
-
-const TAB_LABELS: Record<TabKey, string> = {
-  auction: '竞价引擎',
-  position: '持仓监控',
-  signal: '信号列表',
-  limit: '涨跌停',
-  watchlist: '自选股',
-  tradelog: '交易日志',
-  report: '复盘',
-  backtest: '回测',
-  account: '账户',
-  concept: '概念',
-  dragon: '龙虎榜',
-  compare: '对比',
+interface NavItem {
+  key: NavKey
+  icon: string
+  label: string
 }
 
+const NAV_ITEMS: NavItem[] = [
+  { key: 'overview', icon: '\u{1F4CA}', label: '大盘总览' },
+  { key: 'auction', icon: '\u{1F525}', label: '竞价引擎' },
+  { key: 'position', icon: '\u{1F4CB}', label: '持仓监控' },
+  { key: 'signal', icon: '\u{1F6A8}', label: '信号预警' },
+  { key: 'limit', icon: '\u{1F4C8}', label: '涨跌停' },
+  { key: 'watchlist', icon: '\u2B50', label: '自选股' },
+  { key: 'kline', icon: '\u{1F4CA}', label: 'K线/分时' },
+  { key: 'tradelog', icon: '\u{1F4DD}', label: '交易日志' },
+  { key: 'risk', icon: '\u{1F6E1}\uFE0F', label: '风控中心' },
+  { key: 'settings', icon: '\u2699\uFE0F', label: '系统设置' },
+]
+
+/* ====== 键盘快捷键映射（Ctrl+数字） ====== */
+const KEY_MAP: Record<string, NavKey> = {
+  '1': 'overview',
+  '2': 'auction',
+  '3': 'position',
+  '4': 'signal',
+  '5': 'limit',
+  '6': 'watchlist',
+  '7': 'kline',
+  '8': 'tradelog',
+  '9': 'risk',
+  '0': 'settings',
+}
+
+/* ====== Dashboard 主组件 ====== */
 const Dashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<TabKey>('auction')
+  const [activeNav, setActiveNav] = useState<NavKey>('overview')
   const { data, isConnected, isLoading, refresh } = useMarketData()
   const [showShortcuts, setShowShortcuts] = useState(false)
 
   // 尾盘提醒：14:45-15:00
   const [showClosingAlert, setShowClosingAlert] = useState(false)
   const [closingMinutes, setClosingMinutes] = useState(0)
+
+  // 顶部搜索框状态
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<any[]>([])
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false)
+  const searchRef = useRef<HTMLDivElement>(null)
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  // 添加持仓模态框状态
+  const [showAddPositionModal, setShowAddPositionModal] = useState(false)
+  const [positionModalStock, setPositionModalStock] = useState<any>(null)
+  const [positionVolume, setPositionVolume] = useState('100')
+  const [positionStopLoss, setPositionStopLoss] = useState('')
+  const [positionTakeProfit, setPositionTakeProfit] = useState('')
+  const [positionSubmitting, setPositionSubmitting] = useState(false)
+
+  // K线/分时页面状态
+  const [klineCode, setKlineCode] = useState('')
+  const [klineName, setKlineName] = useState('')
+  const [klineSearchQuery, setKlineSearchQuery] = useState('')
+  const [klineSearchResults, setKlineSearchResults] = useState<any[]>([])
+  const [showKlineSearch, setShowKlineSearch] = useState(false)
+  const [showMinuteChart, setShowMinuteChart] = useState(false)
 
   useEffect(() => {
     const checkClosingTime = () => {
@@ -51,7 +105,6 @@ const Dashboard: React.FC = () => {
       const minutes = now.getMinutes()
       const currentMinutes = hours * 60 + minutes
 
-      // 14:45 = 885, 15:00 = 900
       if (currentMinutes >= 885 && currentMinutes < 900) {
         setShowClosingAlert(true)
         setClosingMinutes(900 - currentMinutes)
@@ -65,39 +118,41 @@ const Dashboard: React.FC = () => {
     return () => clearInterval(timer)
   }, [])
 
+  // 点击外部关闭搜索下拉
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setShowSearchDropdown(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
   // 键盘快捷键
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!e.ctrlKey) return
 
-      // Ctrl+1~9 切换标签页
-      const num = parseInt(e.key)
-      if (!isNaN(num) && num >= 1 && num <= TAB_ORDER.length) {
+      const num = e.key
+      if (KEY_MAP[num]) {
         e.preventDefault()
-        setActiveTab(TAB_ORDER[num - 1])
+        setActiveNav(KEY_MAP[num])
         return
       }
 
-      // Ctrl+F 聚焦搜索框
       if (e.key === 'f' || e.key === 'F') {
         e.preventDefault()
-        // 尝试聚焦 StockSearch 中的 input
-        const inputs = document.querySelectorAll<HTMLInputElement>('input[placeholder*="股票"]')
-        if (inputs.length > 0) {
-          inputs[0].focus()
-        }
+        searchInputRef.current?.focus()
         return
       }
 
-      // Ctrl+R 刷新数据
       if (e.key === 'r' || e.key === 'R') {
         e.preventDefault()
         if (refresh) refresh()
-        window.location.reload()
         return
       }
 
-      // Ctrl+/ 显示快捷键提示
       if (e.key === '/') {
         e.preventDefault()
         setShowShortcuts(prev => !prev)
@@ -108,390 +163,655 @@ const Dashboard: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [refresh])
 
-  const statusDotStyle: React.CSSProperties = {
-    width: '8px',
-    height: '8px',
-    borderRadius: '50%',
-    background: isConnected ? '#00D4AA' : '#FF6B6B',
-    boxShadow: isConnected ? '0 0 8px #00D4AA' : '0 0 8px #FF6B6B',
+  // 顶部搜索功能
+  const handleSearch = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setSearchResults([])
+      setShowSearchDropdown(false)
+      return
+    }
+
+    try {
+      const res = await fetch(`/api/stock/search?code=${encodeURIComponent(query)}`)
+      const result = await res.json()
+      if (result.found) {
+        setSearchResults([result])
+      } else {
+        setSearchResults([])
+      }
+      setShowSearchDropdown(true)
+    } catch {
+      setSearchResults([])
+    }
+  }, [])
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch(searchQuery)
+    }
+  }
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value)
+    if (e.target.value.trim()) {
+      handleSearch(e.target.value)
+    } else {
+      setShowSearchDropdown(false)
+    }
+  }
+
+  // 添加持仓（模态框方式）
+  const openAddPositionModal = (stock: any) => {
+    setPositionModalStock(stock)
+    setPositionVolume('100')
+    setPositionStopLoss(stock ? (stock.price * 0.97).toFixed(2) : '')
+    setPositionTakeProfit(stock ? (stock.price * 1.05).toFixed(2) : '')
+    setShowAddPositionModal(true)
+    setShowSearchDropdown(false)
+  }
+
+  const submitAddPosition = async () => {
+    if (!positionModalStock || !positionVolume) return
+    setPositionSubmitting(true)
+    try {
+      const res = await fetch('/api/positions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: positionModalStock.code,
+          name: positionModalStock.name,
+          buy_price: positionModalStock.price,
+          current_price: positionModalStock.price,
+          volume: parseInt(positionVolume),
+          sector: '',
+          buy_time: new Date().toISOString(),
+          stop_loss_price: parseFloat(positionStopLoss) || +(positionModalStock.price * 0.97).toFixed(2),
+          take_profit_price: parseFloat(positionTakeProfit) || +(positionModalStock.price * 1.05).toFixed(2),
+        }),
+      })
+      await res.json()
+      setShowAddPositionModal(false)
+      if (refresh) refresh()
+    } catch {
+      // 静默失败
+    } finally {
+      setPositionSubmitting(false)
+    }
+  }
+
+  // K线搜索
+  const handleKlineSearch = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setKlineSearchResults([])
+      setShowKlineSearch(false)
+      return
+    }
+    try {
+      const res = await fetch(`/api/stock/search?code=${encodeURIComponent(query)}`)
+      const result = await res.json()
+      if (result.found) {
+        setKlineSearchResults([result])
+        setShowKlineSearch(true)
+      } else {
+        setKlineSearchResults([])
+      }
+    } catch {
+      setKlineSearchResults([])
+    }
+  }, [])
+
+  // ====== 渲染顶部指数栏 ======
+  const renderIndicesBar = () => {
+    const indices = data?.indices
+    if (!indices || indices.length === 0) {
+      return (
+        <div className={styles.indicesRow}>
+          <span style={{ color: '#bbb', fontSize: 13 }}>暂无指数数据</span>
+        </div>
+      )
+    }
+
+    return (
+      <div className={styles.indicesRow}>
+        {indices.map((idx: any) => {
+          const isUp = idx.change_pct > 0
+          const colorClass = isUp ? styles.indexUp : idx.change_pct < 0 ? styles.indexDown : styles.indexFlat
+          return (
+            <div key={idx.code} className={styles.indexCard}>
+              <span className={styles.indexName}>{idx.name}</span>
+              <span className={`${styles.indexPrice} ${colorClass}`}>
+                {idx.price?.toFixed(2) ?? '--'}
+              </span>
+              <span className={`${styles.indexChange} ${colorClass}`}>
+                {isUp ? '+' : ''}{idx.change_pct?.toFixed(2) ?? '--'}%
+              </span>
+            </div>
+          )
+        })}
+      </div>
+    )
+  }
+
+  // ====== 渲染大盘总览页面 ======
+  const renderOverview = () => {
+    const positions = data?.positions
+    const risk = data?.risk
+    const auction = data?.auction
+
+    // 计算市场情绪
+    const upCount = positions?.up_count ?? 0
+    const downCount = positions?.down_count ?? 0
+    const limitUp = positions?.limit_up_count ?? 0
+    const limitDown = positions?.limit_down_count ?? 0
+    const total = upCount + downCount || 1
+    const sentimentScore = Math.round(((upCount - downCount) / total) * 100 + 50)
+    const clampedScore = Math.max(0, Math.min(100, sentimentScore))
+
+    // 板块强度TOP5（从auction数据中提取）
+    const sectors = auction?.sectors?.slice(0, 5) ?? []
+
+    // 龙头竞价评分（从auction数据中提取）
+    const dragons = auction?.dragons?.slice(0, 5) ?? []
+
+    return (
+      <div className={styles.overviewGrid}>
+        {/* 市场情绪卡片 */}
+        <div className={`${styles.card} ${styles.overviewSentiment}`}>
+          <div className={styles.cardHeader}>
+            <h3 className={styles.cardTitle}>市场情绪</h3>
+            <span style={{ fontSize: 12, color: '#999' }}>
+              {data?.timestamp ? new Date(data.timestamp).toLocaleTimeString('zh-CN') : '--'}
+            </span>
+          </div>
+          <div className={styles.cardBody}>
+            <div className={styles.sentimentRow}>
+              <div className={styles.sentimentItem}>
+                <div className={styles.sentimentLabel}>情绪评分</div>
+                <div className={`${styles.sentimentScore} ${
+                  clampedScore > 60 ? styles.sentimentScoreBullish :
+                  clampedScore < 40 ? styles.sentimentScoreBearish :
+                  styles.sentimentScoreNeutral
+                }`}>
+                  {clampedScore}
+                </div>
+              </div>
+              <div className={styles.sentimentItem}>
+                <div className={styles.sentimentLabel}>涨/跌家数</div>
+                <div className={styles.sentimentValue}>
+                  <span className={styles.sentimentUpCount}>{upCount}</span>
+                  <span style={{ color: '#999', margin: '0 4px' }}>/</span>
+                  <span className={styles.sentimentDownCount}>{downCount}</span>
+                </div>
+              </div>
+              <div className={styles.sentimentItem}>
+                <div className={styles.sentimentLabel}>涨停 / 跌停</div>
+                <div className={styles.sentimentValue}>
+                  <span className={styles.sentimentUpCount}>{limitUp}</span>
+                  <span style={{ color: '#999', margin: '0 4px' }}>/</span>
+                  <span className={styles.sentimentDownCount}>{limitDown}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 板块强度TOP5 */}
+        <div className={`${styles.card} ${styles.overviewSector}`}>
+          <div className={styles.cardHeader}>
+            <h3 className={styles.cardTitle}>板块强度 TOP5</h3>
+          </div>
+          <div className={styles.cardBody}>
+            {sectors.length > 0 ? (
+              <div className={styles.sectorList}>
+                {sectors.map((s: any, i: number) => (
+                  <div key={i} className={styles.sectorItem}>
+                    <span className={styles.sectorRank}>{i + 1}</span>
+                    <span className={styles.sectorName}>{s.name ?? '--'}</span>
+                    <span className={`${styles.sectorChange} ${s.change_pct > 0 ? styles.indexUp : styles.indexDown}`}>
+                      {s.change_pct > 0 ? '+' : ''}{s.change_pct?.toFixed(2)}%
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className={styles.emptyState}>暂无板块数据</div>
+            )}
+          </div>
+        </div>
+
+        {/* 龙头竞价评分 */}
+        <div className={`${styles.card} ${styles.overviewAuction}`}>
+          <div className={styles.cardHeader}>
+            <h3 className={styles.cardTitle}>龙头竞价评分</h3>
+          </div>
+          <div className={styles.cardBody}>
+            {dragons.length > 0 ? (
+              <div className={styles.auctionList}>
+                {dragons.map((d: any, i: number) => (
+                  <div key={i} className={styles.auctionItem}>
+                    <div>
+                      <span className={styles.auctionName}>{d.name ?? '--'}</span>
+                      <span className={styles.auctionCode}>{d.code ?? ''}</span>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <span className={styles.auctionScore}>{d.score ?? '--'}</span>
+                      <span className={styles.auctionScoreLabel}>分</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className={styles.emptyState}>暂无竞价数据</div>
+            )}
+          </div>
+        </div>
+
+        {/* 持仓列表 */}
+        <div className={`${styles.card} ${styles.overviewPosition}`}>
+          <div className={styles.cardHeader}>
+            <h3 className={styles.cardTitle}>持仓列表</h3>
+          </div>
+          <div className={styles.cardBody}>
+            <PositionPanel data={positions} />
+          </div>
+        </div>
+
+        {/* 风控状态 */}
+        <div className={`${styles.card} ${styles.overviewRisk}`}>
+          <div className={styles.cardHeader}>
+            <h3 className={styles.cardTitle}>风控状态</h3>
+          </div>
+          <div className={styles.cardBody}>
+            <RiskPanel data={risk} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ====== 渲染K线/分时页面 ======
+  const renderKlinePage = () => (
+    <div className={styles.panelContainer}>
+      <div style={{ marginBottom: 12 }}>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+          <input
+            style={{
+              flex: 1, padding: '8px 12px', background: '#fff',
+              border: '1px solid #e0e0e0', borderRadius: 6,
+              color: '#333', fontSize: 14, outline: 'none', fontFamily: 'inherit',
+            }}
+            placeholder="输入股票代码查看K线/分时 (如: 600519)"
+            value={klineSearchQuery}
+            onChange={(e) => {
+              setKlineSearchQuery(e.target.value)
+              handleKlineSearch(e.target.value)
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleKlineSearch(klineSearchQuery)
+            }}
+          />
+          <button
+            style={{
+              padding: '8px 16px', background: '#e94560', color: '#fff',
+              border: 'none', borderRadius: 6, fontSize: 14, fontWeight: 600,
+              cursor: 'pointer', fontFamily: 'inherit',
+            }}
+            onClick={() => handleKlineSearch(klineSearchQuery)}
+          >
+            搜索
+          </button>
+          {klineCode && (
+            <button
+              style={{
+                padding: '8px 16px', background: '#f5f5f5', color: '#666',
+                border: '1px solid #e0e0e0', borderRadius: 6, fontSize: 14,
+                cursor: 'pointer', fontFamily: 'inherit',
+              }}
+              onClick={() => setShowMinuteChart(!showMinuteChart)}
+            >
+              {showMinuteChart ? '切换K线' : '切换分时'}
+            </button>
+          )}
+        </div>
+        {showKlineSearch && klineSearchResults.length > 0 && (
+          <div style={{
+            background: '#fff', border: '1px solid #e0e0e0', borderRadius: 6,
+            padding: '8px 12px', marginBottom: 8, cursor: 'pointer',
+          }}
+          onClick={() => {
+            const s = klineSearchResults[0]
+            setKlineCode(s.code)
+            setKlineName(s.name)
+            setShowKlineSearch(false)
+            setKlineSearchQuery(`${s.name}(${s.code})`)
+          }}
+          >
+            {klineSearchResults[0].name} ({klineSearchResults[0].code}) - 点击查看图表
+          </div>
+        )}
+      </div>
+      {klineCode && klineName && (
+        showMinuteChart
+          ? <MinuteChart code={klineCode} name={klineName} />
+          : <KlineChart code={klineCode} name={klineName} />
+      )}
+      {!klineCode && (
+        <div className={styles.emptyState}>请输入股票代码查看K线或分时图</div>
+      )}
+    </div>
+  )
+
+  // ====== 渲染主内容区 ======
+  const renderContent = () => {
+    switch (activeNav) {
+      case 'overview':
+        return renderOverview()
+      case 'auction':
+        return <div className={styles.panelContainer}><AuctionPanel data={data?.auction} /></div>
+      case 'position':
+        return <div className={styles.panelContainer}><PositionPanel data={data?.positions} /></div>
+      case 'signal':
+        return <div className={styles.panelContainer}><SignalPanel data={data?.signals} /></div>
+      case 'limit':
+        return <div className={styles.panelContainer}><LimitMonitor /></div>
+      case 'watchlist':
+        return <div className={styles.panelContainer}><WatchlistPanel /></div>
+      case 'kline':
+        return renderKlinePage()
+      case 'tradelog':
+        return <div className={styles.panelContainer}><TradeLog /></div>
+      case 'risk':
+        return <div className={styles.panelContainer}><RiskPanel data={data?.risk} /></div>
+      case 'settings':
+        return (
+          <div className={styles.panelContainer}>
+            <div className={styles.card}>
+              <div className={styles.cardHeader}>
+                <h3 className={styles.cardTitle}>系统设置</h3>
+              </div>
+              <div className={styles.cardBody}>
+                <AccountManager />
+              </div>
+            </div>
+            <div className={styles.card} style={{ marginTop: 16 }}>
+              <div className={styles.cardHeader}>
+                <h3 className={styles.cardTitle}>复盘报告</h3>
+              </div>
+              <div className={styles.cardBody}>
+                <DailyReport />
+              </div>
+            </div>
+            <div className={styles.card} style={{ marginTop: 16 }}>
+              <div className={styles.cardHeader}>
+                <h3 className={styles.cardTitle}>回测面板</h3>
+              </div>
+              <div className={styles.cardBody}>
+                <BacktestPanel />
+              </div>
+            </div>
+            <div className={styles.card} style={{ marginTop: 16 }}>
+              <div className={styles.cardHeader}>
+                <h3 className={styles.cardTitle}>概念板块</h3>
+              </div>
+              <div className={styles.cardBody}>
+                <ConceptPanel />
+              </div>
+            </div>
+            <div className={styles.card} style={{ marginTop: 16 }}>
+              <div className={styles.cardHeader}>
+                <h3 className={styles.cardTitle}>龙虎榜</h3>
+              </div>
+              <div className={styles.cardBody}>
+                <DragonTiger />
+              </div>
+            </div>
+            <div className={styles.card} style={{ marginTop: 16 }}>
+              <div className={styles.cardHeader}>
+                <h3 className={styles.cardTitle}>多股对比</h3>
+              </div>
+              <div className={styles.cardBody}>
+                <MultiStockCompare />
+              </div>
+            </div>
+            <div className={styles.card} style={{ marginTop: 16 }}>
+              <div className={styles.cardHeader}>
+                <h3 className={styles.cardTitle}>股票搜索</h3>
+              </div>
+              <div className={styles.cardBody}>
+                <StockSearch />
+              </div>
+            </div>
+            <div className={styles.card} style={{ marginTop: 16 }}>
+              <div className={styles.cardHeader}>
+                <h3 className={styles.cardTitle}>大盘指数</h3>
+              </div>
+              <div className={styles.cardBody}>
+                <MarketIndices data={data?.indices} isLoading={isLoading} />
+              </div>
+            </div>
+          </div>
+        )
+      default:
+        return <div className={styles.emptyState}>页面不存在</div>
+    }
   }
 
   return (
-    <div style={styles.container}>
-      {/* 顶部栏 */}
-      <header style={styles.header}>
-        <div style={styles.title}>
-          <span style={styles.logo}>📈</span>
-          <h1 style={styles.heading}>A股超短交易实时监测系统</h1>
+    <div className={styles.container}>
+      {/* ====== 左侧导航栏 ====== */}
+      <nav className={styles.sidebar}>
+        <div className={styles.sidebarHeader}>
+          <h1 className={styles.sidebarTitle}>A股超短交易</h1>
+          <div className={styles.sidebarSubtitle}>实时监测系统</div>
         </div>
-        <div style={styles.status}>
-          {isLoading && <span style={styles.loading}>加载中...</span>}
-          <span style={statusDotStyle} />
-          <span style={styles.statusText}>{isConnected ? '已连接' : '未连接'}</span>
-          {data?.timestamp && (
-            <span style={styles.time}>
-              更新: {new Date(data.timestamp).toLocaleTimeString('zh-CN')}
-            </span>
-          )}
-          <button
-            style={styles.shortcutBtn}
-            onClick={() => setShowShortcuts(!showShortcuts)}
-            title="快捷键提示 (Ctrl+/)"
-          >
-            ⌨
-          </button>
-        </div>
-      </header>
 
-      {/* 尾盘操作提醒条 */}
-      {showClosingAlert && (
-        <div style={styles.closingAlert}>
-          <div style={styles.closingAlertContent}>
-            <span style={styles.closingAlertIcon}>⚠</span>
-            <span style={styles.closingAlertText}>
-              尾盘提醒 - 距收盘还有 {closingMinutes} 分钟
+        <div className={styles.navList}>
+          {NAV_ITEMS.map((item) => (
+            <button
+              key={item.key}
+              className={`${styles.navItem} ${activeNav === item.key ? styles.navItemActive : ''}`}
+              onClick={() => setActiveNav(item.key)}
+            >
+              <span className={styles.navIcon}>{item.icon}</span>
+              <span className={styles.navLabel}>{item.label}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className={styles.sidebarFooter}>
+          <span className={`${styles.statusDot} ${isConnected ? styles.statusDotConnected : styles.statusDotDisconnected}`} />
+          <span className={styles.sidebarStatusText}>
+            {isConnected ? 'WebSocket 已连接' : 'WebSocket 未连接'}
+          </span>
+        </div>
+      </nav>
+
+      {/* ====== 右侧主内容区 ====== */}
+      <div className={styles.mainArea}>
+        {/* 顶部状态栏 */}
+        <div className={styles.topBar}>
+          {renderIndicesBar()}
+
+          <div className={styles.topBarRight}>
+            {isLoading && <span className={styles.topBarLoading}>加载中...</span>}
+            {data?.timestamp && (
+              <span className={styles.topBarTime}>
+                更新: {new Date(data.timestamp).toLocaleTimeString('zh-CN')}
+              </span>
+            )}
+
+            {/* 搜索框 */}
+            <div className={styles.searchBox} ref={searchRef}>
+              <span className={styles.searchIcon}>&#128269;</span>
+              <input
+                ref={searchInputRef}
+                className={styles.searchInput}
+                placeholder="搜索股票代码..."
+                value={searchQuery}
+                onChange={handleSearchChange}
+                onKeyDown={handleSearchKeyDown}
+              />
+              {showSearchDropdown && searchResults.length > 0 && (
+                <div className={styles.searchDropdown}>
+                  {searchResults.map((s: any) => (
+                    <div key={s.code} className={styles.searchDropdownItem} onClick={() => openAddPositionModal(s)}>
+                      <div>
+                        <span className={styles.searchDropdownName}>{s.name}</span>
+                        <span className={styles.searchDropdownCode}>{s.code}</span>
+                      </div>
+                      <span className={`${styles.searchDropdownPrice} ${s.change_pct >= 0 ? styles.indexUp : styles.indexDown}`}>
+                        {s.price?.toFixed(2)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <button
+              className={styles.shortcutBtn}
+              onClick={() => setShowShortcuts(!showShortcuts)}
+              title="快捷键提示 (Ctrl+/)"
+            >
+              &#9000;
+            </button>
+          </div>
+        </div>
+
+        {/* 尾盘操作提醒条 */}
+        {showClosingAlert && (
+          <div className={styles.closingAlert}>
+            <div className={styles.closingAlertContent}>
+              <span className={styles.closingAlertIcon}>&#9888;</span>
+              <span className={styles.closingAlertText}>
+                尾盘提醒 - 距收盘还有 {closingMinutes} 分钟
+              </span>
+              <span className={styles.closingAlertActions}>
+                请检查持仓，执行隔夜风控：非涨停股需清仓，确认止损位已设置
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* 中间内容区 */}
+        <div className={styles.contentArea}>
+          {renderContent()}
+        </div>
+
+        {/* 底部状态栏 */}
+        <div className={styles.bottomBar}>
+          <div className={styles.bottomBarLeft}>
+            <span className={`${styles.statusDot} ${isConnected ? styles.statusDotConnected : styles.statusDotDisconnected}`} />
+            <span style={{ fontSize: 12, color: '#999' }}>
+              {isConnected ? '数据连接正常' : '数据连接断开，正在重连...'}
             </span>
-            <span style={styles.closingAlertActions}>
-              请检查持仓，执行隔夜风控：非涨停股需清仓，确认止损位已设置
-            </span>
+          </div>
+          <div className={styles.bottomBarRight}>
+            {data?.timestamp
+              ? `数据刷新: ${new Date(data.timestamp).toLocaleTimeString('zh-CN')}`
+              : '等待数据...'}
+          </div>
+        </div>
+      </div>
+
+      {/* ====== 快捷键提示弹窗 ====== */}
+      {showShortcuts && (
+        <div className={styles.shortcutOverlay} onClick={() => setShowShortcuts(false)}>
+          <div className={styles.shortcutModal} onClick={e => e.stopPropagation()}>
+            <div className={styles.shortcutHeader}>
+              <h3 className={styles.shortcutTitle}>键盘快捷键</h3>
+              <button className={styles.shortcutClose} onClick={() => setShowShortcuts(false)}>&times;</button>
+            </div>
+            <div className={styles.shortcutList}>
+              <div className={styles.shortcutItem}>
+                <span className={styles.shortcutKey}>Ctrl + 1~0</span>
+                <span className={styles.shortcutDesc}>切换导航页面</span>
+              </div>
+              <div className={styles.shortcutItem}>
+                <span className={styles.shortcutKey}>Ctrl + F</span>
+                <span className={styles.shortcutDesc}>聚焦搜索框</span>
+              </div>
+              <div className={styles.shortcutItem}>
+                <span className={styles.shortcutKey}>Ctrl + R</span>
+                <span className={styles.shortcutDesc}>刷新数据</span>
+              </div>
+              <div className={styles.shortcutItem}>
+                <span className={styles.shortcutKey}>Ctrl + /</span>
+                <span className={styles.shortcutDesc}>显示/隐藏快捷键提示</span>
+              </div>
+            </div>
           </div>
         </div>
       )}
 
-      {/* 大盘指数栏 */}
-      <MarketIndices data={data?.indices} isLoading={isLoading} />
-
-      {/* 主内容区 */}
-      <div style={styles.main}>
-        {/* 左侧：切换面板 */}
-        <div style={styles.leftPanel}>
-          <StockSearch />
-          <div style={styles.tabs}>
-            {TAB_ORDER.map((key) => (
-              <TabButton
-                key={key}
-                active={activeTab === key}
-                onClick={() => setActiveTab(key)}
-                label={TAB_LABELS[key]}
-              />
-            ))}
-          </div>
-
-          <div style={styles.tabContent}>
-            {activeTab === 'auction' && <AuctionPanel data={data?.auction} />}
-            {activeTab === 'position' && <PositionPanel data={data?.positions} />}
-            {activeTab === 'signal' && <SignalPanel data={data?.signals} />}
-            {activeTab === 'limit' && <LimitMonitor />}
-            {activeTab === 'watchlist' && <WatchlistPanel />}
-            {activeTab === 'tradelog' && <TradeLog />}
-            {activeTab === 'report' && <DailyReport />}
-            {activeTab === 'backtest' && <BacktestPanel />}
-            {activeTab === 'account' && <AccountManager />}
-            {activeTab === 'concept' && <ConceptPanel />}
-            {activeTab === 'dragon' && <DragonTiger />}
-            {activeTab === 'compare' && <MultiStockCompare />}
-          </div>
-        </div>
-
-        {/* 右侧：风控面板 */}
-        <div style={styles.rightPanel}>
-          <RiskPanel data={data?.risk} />
-        </div>
-      </div>
-
-      {/* 快捷键提示弹窗 */}
-      {showShortcuts && (
-        <div style={styles.shortcutOverlay} onClick={() => setShowShortcuts(false)}>
-          <div style={styles.shortcutModal} onClick={e => e.stopPropagation()}>
-            <div style={styles.shortcutHeader}>
-              <h3 style={styles.shortcutTitle}>键盘快捷键</h3>
-              <button style={styles.shortcutClose} onClick={() => setShowShortcuts(false)}>×</button>
+      {/* ====== 添加持仓模态框 ====== */}
+      {showAddPositionModal && positionModalStock && (
+        <div className={styles.modalOverlay} onClick={() => setShowAddPositionModal(false)}>
+          <div className={styles.modal} onClick={e => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h3 className={styles.modalTitle}>添加持仓</h3>
+              <button className={styles.modalClose} onClick={() => setShowAddPositionModal(false)}>&times;</button>
             </div>
-            <div style={styles.shortcutList}>
-              <div style={styles.shortcutItem}>
-                <span style={styles.shortcutKey}>Ctrl + 1~9</span>
-                <span style={styles.shortcutDesc}>切换标签页</span>
+            <div className={styles.modalBody}>
+              <div className={styles.modalStockInfo}>
+                <div>
+                  <div className={styles.modalStockName}>{positionModalStock.name}</div>
+                  <div className={styles.modalStockCode}>{positionModalStock.code}</div>
+                </div>
+                <span className={`${styles.modalStockPrice} ${positionModalStock.change_pct >= 0 ? styles.indexUp : styles.indexDown}`}>
+                  {positionModalStock.price?.toFixed(2)}
+                </span>
               </div>
-              <div style={styles.shortcutItem}>
-                <span style={styles.shortcutKey}>Ctrl + F</span>
-                <span style={styles.shortcutDesc}>聚焦搜索框</span>
+              <div className={styles.modalField}>
+                <label className={styles.modalLabel}>买入数量（股）</label>
+                <input
+                  className={styles.modalInput}
+                  type="number"
+                  value={positionVolume}
+                  onChange={e => setPositionVolume(e.target.value)}
+                  placeholder="请输入买入股数"
+                />
               </div>
-              <div style={styles.shortcutItem}>
-                <span style={styles.shortcutKey}>Ctrl + R</span>
-                <span style={styles.shortcutDesc}>刷新数据</span>
+              <div className={styles.modalField}>
+                <label className={styles.modalLabel}>止损价（元）</label>
+                <input
+                  className={styles.modalInput}
+                  type="number"
+                  step="0.01"
+                  value={positionStopLoss}
+                  onChange={e => setPositionStopLoss(e.target.value)}
+                  placeholder="默认买入价 -3%"
+                />
               </div>
-              <div style={styles.shortcutItem}>
-                <span style={styles.shortcutKey}>Ctrl + /</span>
-                <span style={styles.shortcutDesc}>显示/隐藏快捷键提示</span>
+              <div className={styles.modalField}>
+                <label className={styles.modalLabel}>止盈价（元）</label>
+                <input
+                  className={styles.modalInput}
+                  type="number"
+                  step="0.01"
+                  value={positionTakeProfit}
+                  onChange={e => setPositionTakeProfit(e.target.value)}
+                  placeholder="默认买入价 +5%"
+                />
               </div>
+            </div>
+            <div className={styles.modalFooter}>
+              <button className={styles.modalBtnCancel} onClick={() => setShowAddPositionModal(false)}>
+                取消
+              </button>
+              <button
+                className={styles.modalBtnConfirm}
+                onClick={submitAddPosition}
+                disabled={positionSubmitting || !positionVolume}
+              >
+                {positionSubmitting ? '提交中...' : '确认买入'}
+              </button>
             </div>
           </div>
         </div>
       )}
     </div>
   )
-}
-
-const TabButton: React.FC<{ active: boolean; onClick: () => void; label: string }> = ({ active, onClick, label }) => {
-  const style: React.CSSProperties = {
-    padding: '8px 16px',
-    border: 'none',
-    borderRadius: '6px',
-    background: active ? '#00D4AA' : '#1A2540',
-    color: active ? '#0B1120' : '#7A8BA7',
-    fontSize: '13px',
-    fontWeight: 600,
-    cursor: 'pointer',
-    transition: 'all 0.2s',
-    whiteSpace: 'nowrap',
-    flexShrink: 0,
-  }
-  return <button style={style} onClick={onClick}>{label}</button>
-}
-
-const styles: Record<string, React.CSSProperties> = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100vh',
-    background: '#0B1120',
-    color: '#E8ECF4',
-    fontFamily: '-apple-system, "PingFang SC", "Microsoft YaHei", sans-serif',
-  },
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '12px 24px',
-    background: '#131B2E',
-    borderBottom: '1px solid #243050',
-    flexWrap: 'wrap',
-    gap: '8px',
-  },
-  title: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-  },
-  logo: {
-    fontSize: '24px',
-  },
-  heading: {
-    fontSize: '18px',
-    fontWeight: 600,
-    color: '#E8ECF4',
-    margin: 0,
-  },
-  status: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-  },
-  loading: {
-    fontSize: '12px',
-    color: '#FFB84D',
-  },
-  statusText: {
-    fontSize: '13px',
-    color: '#7A8BA7',
-  },
-  time: {
-    fontSize: '11px',
-    color: '#5A6B87',
-    fontFamily: 'monospace',
-  },
-  shortcutBtn: {
-    padding: '4px 8px',
-    border: '1px solid #243050',
-    borderRadius: '4px',
-    background: '#1A2540',
-    color: '#7A8BA7',
-    fontSize: '14px',
-    cursor: 'pointer',
-    lineHeight: 1,
-  },
-  closingAlert: {
-    padding: '10px 24px',
-    background: 'linear-gradient(90deg, rgba(255,184,77,0.15) 0%, rgba(255,107,107,0.15) 100%)',
-    borderBottom: '1px solid rgba(255,184,77,0.4)',
-    animation: 'pulse 2s ease-in-out infinite',
-  },
-  closingAlertContent: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    maxWidth: '1200px',
-    margin: '0 auto',
-    flexWrap: 'wrap',
-  },
-  closingAlertIcon: {
-    fontSize: '18px',
-    color: '#FFB84D',
-  },
-  closingAlertText: {
-    fontSize: '14px',
-    fontWeight: 700,
-    color: '#FFB84D',
-    whiteSpace: 'nowrap',
-  },
-  closingAlertActions: {
-    fontSize: '13px',
-    color: '#E8ECF4',
-  },
-  main: {
-    display: 'flex',
-    flex: 1,
-    overflow: 'hidden',
-    padding: '16px',
-    gap: '16px',
-  },
-  leftPanel: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    minWidth: 0,
-  },
-  tabs: {
-    display: 'flex',
-    gap: '4px',
-    marginBottom: '12px',
-    overflowX: 'auto',
-    paddingBottom: '4px',
-    scrollbarWidth: 'thin',
-    scrollbarColor: '#243050 transparent',
-  },
-  tabContent: {
-    flex: 1,
-    overflow: 'auto',
-    background: '#131B2E',
-    borderRadius: '8px',
-    border: '1px solid #243050',
-    padding: '16px',
-  },
-  rightPanel: {
-    width: '320px',
-    flexShrink: 0,
-  },
-  shortcutOverlay: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: 'rgba(0,0,0,0.6)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1000,
-  },
-  shortcutModal: {
-    background: '#1A2540',
-    borderRadius: '12px',
-    border: '1px solid #243050',
-    padding: '20px',
-    minWidth: '320px',
-    maxWidth: '90vw',
-    boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
-  },
-  shortcutHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '16px',
-    paddingBottom: '12px',
-    borderBottom: '1px solid #243050',
-  },
-  shortcutTitle: {
-    fontSize: '16px',
-    fontWeight: 600,
-    color: '#E8ECF4',
-    margin: 0,
-  },
-  shortcutClose: {
-    padding: '2px 8px',
-    border: 'none',
-    borderRadius: '4px',
-    background: 'transparent',
-    color: '#7A8BA7',
-    fontSize: '20px',
-    cursor: 'pointer',
-    lineHeight: 1,
-  },
-  shortcutList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '10px',
-  },
-  shortcutItem: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '8px 12px',
-    background: '#0B1120',
-    borderRadius: '6px',
-  },
-  shortcutKey: {
-    fontSize: '13px',
-    fontWeight: 600,
-    color: '#00D4AA',
-    fontFamily: 'monospace',
-    background: '#1A2540',
-    padding: '2px 8px',
-    borderRadius: '4px',
-    border: '1px solid #243050',
-  },
-  shortcutDesc: {
-    fontSize: '13px',
-    color: '#B8C4D4',
-  },
-}
-
-// 移动端媒体查询样式注入
-const mobileStyles = `
-@media (max-width: 768px) {
-  #root > div > header {
-    padding: 8px 12px !important;
-  }
-  #root > div > header h1 {
-    font-size: 14px !important;
-  }
-  #root > div > header .logo {
-    font-size: 18px !important;
-  }
-  #root > div > div[style*="padding: 12px 24px"] {
-    padding: 8px 12px !important;
-  }
-  #root > div > div[style*="display: flex; flex: 1"] {
-    flex-direction: column !important;
-    padding: 8px !important;
-    gap: 8px !important;
-    overflow: auto !important;
-  }
-  #root > div > div[style*="display: flex; flex: 1"] > div:last-child {
-    width: 100% !important;
-    order: 99 !important;
-  }
-  #root > div > div[style*="display: flex; flex: 1"] > div:first-child {
-    min-height: 0 !important;
-  }
-  #root canvas[style*="height: 380px"] {
-    height: 240px !important;
-  }
-  #root canvas[style*="height: 280px"] {
-    height: 200px !important;
-  }
-}
-`
-
-// 注入移动端样式
-if (typeof document !== 'undefined') {
-  const existing = document.getElementById('dashboard-mobile-styles')
-  if (!existing) {
-    const styleEl = document.createElement('style')
-    styleEl.id = 'dashboard-mobile-styles'
-    styleEl.textContent = mobileStyles
-    document.head.appendChild(styleEl)
-  }
 }
 
 export default Dashboard

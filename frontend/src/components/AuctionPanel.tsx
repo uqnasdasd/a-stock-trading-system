@@ -39,7 +39,7 @@ interface Props {
     leader_scores?: LeaderScore[]
     emotion?: Emotion
     candidates?: any[]
-    auction_volumes?: AuctionVolume[]
+    auction_volume?: AuctionVolume[]
     error?: string
   }
 }
@@ -49,7 +49,7 @@ const AuctionPanel: React.FC<Props> = ({ data }) => {
   const leaders = data?.leader_scores || []
   const emotion = data?.emotion || { level: '平稳', score: 50, up_count: 0, down_count: 0, limit_up: 0, limit_down: 0 }
   const candidates = data?.candidates || []
-  const auctionVolumes = data?.auction_volumes || []
+  const auctionVolumes = data?.auction_volume || []
 
   const getEmotionColor = (level: string) => {
     const map: Record<string, string> = {

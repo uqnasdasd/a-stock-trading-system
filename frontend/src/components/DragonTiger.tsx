@@ -25,8 +25,8 @@ const DragonTiger: React.FC = () => {
     try {
       const res = await fetch('/api/dragon/today')
       const json = await res.json()
-      if (json.data) {
-        setItems(json.data)
+      if (json.dragons) {
+        setItems(json.dragons)
       }
       setLastUpdate(new Date().toLocaleTimeString('zh-CN', { hour12: false }))
     } catch (e) {

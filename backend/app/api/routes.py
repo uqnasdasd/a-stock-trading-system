@@ -1,5 +1,5 @@
 """API路由"""
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Request
 from fastapi.responses import JSONResponse
 from typing import List, Optional
 from datetime import datetime
@@ -115,9 +115,13 @@ async def get_risk_status():
 
 
 @router.post("/api/risk/capital")
-async def set_capital(capital: float):
+async def set_capital(request: Request):
     """设置总资金"""
-    await risk_controller.set_capital(capital)
+    body = await request.json()
+    capital = body.get("total_capital")
+    if capital is None:
+        return JSONResponse(status_code=400, content={"status": "error", "message": "缺少 total_capital 参数"})
+    await risk_controller.set_capital(float(capital))
     return {"status": "success", "capital": capital}
 
 
@@ -315,8 +319,13 @@ async def get_watchlist():
 
 
 @router.post("/api/watchlist")
-async def add_watchlist(code: str, name: str):
+async def add_watchlist(request: Request):
     """添加自选股"""
+    body = await request.json()
+    code = body.get("code")
+    name = body.get("name")
+    if not code or not name:
+        return JSONResponse(status_code=400, content={"status": "error", "message": "缺少 code 或 name 参数"})
     return await watchlist_manager.add(code, name)
 
 

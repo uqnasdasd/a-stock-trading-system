@@ -21,8 +21,8 @@ const TradeLog: React.FC = () => {
     try {
       const res = await fetch('/api/trade/log')
       const json = await res.json()
-      if (json.records) {
-        setRecords(json.records)
+      if (json.logs) {
+        setRecords(json.logs)
       }
     } catch (e) {
       console.error('交易日志获取失败:', e)
