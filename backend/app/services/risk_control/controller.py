@@ -1,10 +1,18 @@
 """风控中枢 - 核心模块M8"""
+import json
 from typing import Dict, List, Optional
 from datetime import datetime, date, timedelta
 from loguru import logger
 from app.models.schemas import Position, RiskStatus, AlertLevel, SignalType
 from app.core.config import settings
-from app.core.database import db_set_setting, db_get_setting
+from app.core.database import (
+    db_set_setting,
+    db_get_setting,
+    db_save_risk_control,
+    db_get_risk_control,
+    db_get_latest_risk_control,
+    db_get_risk_control_by_week,
+)
 
 
 class RiskController:
@@ -21,6 +29,17 @@ class RiskController:
         self.lock_reason: Optional[str] = None
         self.lock_until: Optional[datetime] = None
         self._loaded = False
+        self._current_date: str = date.today().isoformat()
+        self._current_week_start: str = self._get_week_start().isoformat()
+
+    @staticmethod
+    def _get_week_start(d: Optional[date] = None) -> date:
+        """获取指定日期所在周的周一"""
+        if d is None:
+            d = date.today()
+        # weekday(): Monday=0, Sunday=6
+        days_since_monday = d.weekday()
+        return d - timedelta(days=days_since_monday)
 
     async def _ensure_loaded(self):
         """确保从数据库加载配置"""
@@ -29,7 +48,8 @@ class RiskController:
             self._loaded = True
 
     async def load_from_db(self):
-        """从数据库加载风控配置"""
+        """从数据库加载风控配置和状态"""
+        # 1. 加载总资金
         capital_str = await db_get_setting("total_capital")
         if capital_str:
             try:
@@ -37,7 +57,99 @@ class RiskController:
                 logger.info(f"从数据库加载总资金: {self.total_capital}")
             except ValueError:
                 pass
+
+        # 2. 加载最新的风控状态
+        latest = await db_get_latest_risk_control()
+        today = date.today().isoformat()
+        week_start = self._get_week_start().isoformat()
+
+        if latest:
+            record_date = latest.get("date", "")
+            record_week_start = latest.get("week_start", "")
+
+            # 检查日期变化，自动重置日度数据
+            if record_date == today:
+                # 同一天，恢复日度数据
+                self.daily_trades = latest.get("daily_trades", [])
+                self.daily_pnl = latest.get("daily_pnl", 0)
+                logger.info(f"恢复当日风控数据: 交易{len(self.daily_trades)}次, 盈亏{self.daily_pnl:.2f}")
+            else:
+                # 日期变化，重置日度数据
+                self.daily_trades = []
+                self.daily_pnl = 0
+                logger.info(f"检测到日期变化 ({record_date} -> {today})，重置日度数据")
+
+            # 检查周变化，自动重置周度数据
+            if record_week_start == week_start:
+                # 同一周，恢复周度数据
+                self.weekly_trades = latest.get("weekly_trades", [])
+                self.weekly_pnl = latest.get("weekly_pnl", 0)
+                logger.info(f"恢复本周风控数据: 交易{len(self.weekly_trades)}次, 盈亏{self.weekly_pnl:.2f}")
+            else:
+                # 周变化（新的一周），重置周度数据
+                self.weekly_trades = []
+                self.weekly_pnl = 0
+                logger.info(f"检测到新的一周 ({record_week_start} -> {week_start})，重置周度数据")
+
+            # 恢复锁定状态
+            self.is_locked = latest.get("is_locked", False)
+            self.lock_reason = latest.get("lock_reason")
+            lock_until_str = latest.get("lock_until")
+            if lock_until_str:
+                try:
+                    self.lock_until = datetime.fromisoformat(lock_until_str)
+                except (ValueError, TypeError):
+                    self.lock_until = None
+
+            # 检查锁定是否已过期
+            if self.is_locked and self.lock_until and datetime.now() >= self.lock_until:
+                self.is_locked = False
+                self.lock_reason = None
+                self.lock_until = None
+                logger.info("锁定状态已过期，自动解锁")
+        else:
+            logger.info("数据库无历史风控数据，使用初始状态")
+
+        self._current_date = today
+        self._current_week_start = week_start
         self._loaded = True
+
+    async def _persist_state(self):
+        """持久化当前风控状态到数据库"""
+        today = date.today().isoformat()
+        week_start = self._get_week_start().isoformat()
+        lock_until_str = self.lock_until.isoformat() if self.lock_until else None
+
+        await db_save_risk_control(
+            date=today,
+            week_start=week_start,
+            daily_trades=self.daily_trades,
+            weekly_trades=self.weekly_trades,
+            daily_pnl=self.daily_pnl,
+            weekly_pnl=self.weekly_pnl,
+            is_locked=self.is_locked,
+            lock_reason=self.lock_reason,
+            lock_until=lock_until_str,
+        )
+
+    async def _check_date_reset(self):
+        """检查日期变化，自动重置日度/周度数据"""
+        today = date.today().isoformat()
+        week_start = self._get_week_start().isoformat()
+
+        # 日度重置
+        if today != self._current_date:
+            self.daily_trades = []
+            self.daily_pnl = 0
+            self._current_date = today
+            logger.info(f"日期变化，自动重置日度交易数据: {today}")
+
+        # 周度重置（周一）
+        if week_start != self._current_week_start:
+            self.weekly_trades = []
+            self.weekly_pnl = 0
+            self._current_week_start = week_start
+            logger.info(f"新的一周开始，自动重置周度交易数据: {week_start}")
 
     async def set_capital(self, capital: float):
         """设置总资金"""
@@ -55,8 +167,11 @@ class RiskController:
         if code in self.positions:
             del self.positions[code]
 
-    def record_trade(self, code: str, name: str, action: str, price: float, volume: int, pnl: float = 0):
+    async def record_trade(self, code: str, name: str, action: str, price: float, volume: int, pnl: float = 0):
         """记录交易"""
+        await self._ensure_loaded()
+        await self._check_date_reset()
+
         trade = {
             "code": code,
             "name": name,
@@ -64,7 +179,7 @@ class RiskController:
             "price": price,
             "volume": volume,
             "pnl": pnl,
-            "time": datetime.now(),
+            "time": datetime.now().isoformat(),
         }
         self.daily_trades.append(trade)
         self.weekly_trades.append(trade)
@@ -74,6 +189,9 @@ class RiskController:
             self.weekly_pnl += pnl
 
         logger.info(f"记录交易: {name} {action} {volume}股 @ {price}, 盈亏:{pnl}")
+
+        # 持久化到数据库
+        await self._persist_state()
 
     def check_all(self) -> List[dict]:
         """检查所有风控规则，返回告警列表"""
@@ -129,10 +247,10 @@ class RiskController:
                     "message": f"单票仓位{single_pct*100:.1f}%，超过上限{settings.max_single_position*100}%",
                     "trigger_condition": f"单票仓位>{settings.max_single_position*100}%",
                     "suggested_action": "减仓至10%以下",
-                "timestamp": datetime.now().isoformat(),
-                "id": f"{code}_singlelimit_{datetime.now().strftime('%H%M%S')}",
-                "is_read": False,
-            })
+                    "timestamp": datetime.now().isoformat(),
+                    "id": f"{code}_singlelimit_{datetime.now().strftime('%H%M%S')}",
+                    "is_read": False,
+                })
 
         return signals
 
@@ -155,10 +273,10 @@ class RiskController:
                     "message": self.lock_reason,
                     "trigger_condition": f"单日亏损≥{settings.daily_max_loss*100}%",
                     "suggested_action": "今日停止交易，冷静复盘",
-                "timestamp": datetime.now().isoformat(),
-                "id": f"risk_daily_{datetime.now().strftime('%H%M%S')}",
-                "is_read": False,
-            })
+                    "timestamp": datetime.now().isoformat(),
+                    "id": f"risk_daily_{datetime.now().strftime('%H%M%S')}",
+                    "is_read": False,
+                })
 
         return signals
 
@@ -181,10 +299,10 @@ class RiskController:
                     "message": self.lock_reason,
                     "trigger_condition": f"周度亏损≥{settings.weekly_max_loss*100}%",
                     "suggested_action": "暂停1-2天交易，复盘问题",
-                "timestamp": datetime.now().isoformat(),
-                "id": f"risk_weekly_{datetime.now().strftime('%H%M%S')}",
-                "is_read": False,
-            })
+                    "timestamp": datetime.now().isoformat(),
+                    "id": f"risk_weekly_{datetime.now().strftime('%H%M%S')}",
+                    "is_read": False,
+                })
 
         return signals
 
@@ -245,15 +363,18 @@ class RiskController:
                         "message": f"隔夜风险提示：{position.name} 当前盈利{profit_pct:.1f}%，未涨停，建议收盘前清仓",
                         "trigger_condition": "非涨停持仓+收盘前30分钟",
                         "suggested_action": "收盘前清仓，规避隔夜风险",
-                    "timestamp": datetime.now().isoformat(),
-                    "id": f"{code}_overnight_{datetime.now().strftime('%H%M%S')}",
-                    "is_read": False,
-                })
+                        "timestamp": datetime.now().isoformat(),
+                        "id": f"{code}_overnight_{datetime.now().strftime('%H%M%S')}",
+                        "is_read": False,
+                    })
 
         return signals
 
-    def can_trade(self) -> tuple[bool, Optional[str]]:
+    async def can_trade(self) -> tuple[bool, Optional[str]]:
         """检查是否可以交易"""
+        await self._ensure_loaded()
+        await self._check_date_reset()
+
         if self.is_locked:
             if self.lock_until and datetime.now() < self.lock_until:
                 return False, f"交易已锁定: {self.lock_reason}，解锁时间: {self.lock_until.strftime('%Y-%m-%d %H:%M')}"
@@ -262,6 +383,7 @@ class RiskController:
                 self.is_locked = False
                 self.lock_reason = None
                 self.lock_until = None
+                await self._persist_state()
 
         # 检查日交易次数
         if len(self.daily_trades) >= settings.max_trades_per_day:
@@ -273,17 +395,21 @@ class RiskController:
 
         return True, None
 
-    def reset_daily(self):
+    async def reset_daily(self):
         """重置每日数据（收盘后调用）"""
+        await self._ensure_loaded()
         self.daily_trades = []
         self.daily_pnl = 0
         logger.info("重置每日交易数据")
+        await self._persist_state()
 
-    def reset_weekly(self):
+    async def reset_weekly(self):
         """重置每周数据（周一开盘前调用）"""
+        await self._ensure_loaded()
         self.weekly_trades = []
         self.weekly_pnl = 0
         logger.info("重置每周交易数据")
+        await self._persist_state()
 
     def get_status(self) -> RiskStatus:
         """获取风控状态"""

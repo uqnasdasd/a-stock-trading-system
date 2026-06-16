@@ -20,6 +20,9 @@ from app.services.trade_log.logger import trade_logger
 from app.services.daily_report.generator import daily_report_generator
 from app.services.concept_tracker.tracker import concept_tracker
 from app.services.dragon_tiger.dragon import dragon_tiger_service
+from app.services.open_confirm.confirm import open_confirm
+from app.services.morning_breakout.breakout import morning_breakout
+from app.services.afternoon_stable.stable import afternoon_stable
 
 router = APIRouter()
 
@@ -156,11 +159,49 @@ async def get_signals():
     position_signals = await position_monitor.monitor()
     risk_signals = risk_controller.check_all()
 
-    all_signals = position_signals + risk_signals
+    # 新增信号模块
+    open_signals = await open_confirm.analyze_watchlist()
+    breakout_signals = await morning_breakout.analyze_watchlist()
+    stable_signals = await afternoon_stable.analyze_watchlist()
+
+    all_signals = position_signals + risk_signals + open_signals + breakout_signals + stable_signals
 
     return {
         "timestamp": datetime.now().isoformat(),
         "signals": all_signals,
+    }
+
+
+@router.get("/api/signals/open-confirm")
+async def get_open_confirm_signals():
+    """获取开盘确认信号"""
+    signals = await open_confirm.analyze_watchlist()
+    return {
+        "timestamp": datetime.now().isoformat(),
+        "count": len(signals),
+        "signals": signals,
+    }
+
+
+@router.get("/api/signals/morning-breakout")
+async def get_morning_breakout_signals():
+    """获取早盘突破信号"""
+    signals = await morning_breakout.analyze_watchlist()
+    return {
+        "timestamp": datetime.now().isoformat(),
+        "count": len(signals),
+        "signals": signals,
+    }
+
+
+@router.get("/api/signals/afternoon-stable")
+async def get_afternoon_stable_signals():
+    """获取尾盘稳健信号"""
+    signals = await afternoon_stable.analyze_watchlist()
+    return {
+        "timestamp": datetime.now().isoformat(),
+        "count": len(signals),
+        "signals": signals,
     }
 
 
@@ -470,9 +511,23 @@ async def websocket_endpoint(websocket: WebSocket):
 async def background_monitor_task():
     """后台监控任务 - 全天实时运行"""
     report_generated_today = False
+    signals_reset_today = False
     while True:
         try:
             now = datetime.now()
+
+            # 0. 每日开盘前重置信号状态
+            if now.hour == 9 and now.minute == 15 and not signals_reset_today:
+                open_confirm.reset()
+                morning_breakout.reset()
+                afternoon_stable.reset()
+                signals_reset_today = True
+                logger.info("9:15 已重置所有交易信号状态")
+
+            # 跨日重置标记
+            if now.hour == 0 and now.minute == 0:
+                report_generated_today = False
+                signals_reset_today = False
 
             # 1. 获取大盘指数（全天获取）
             indices = await collector.get_index_quotes()
@@ -494,14 +549,25 @@ async def background_monitor_task():
             # 6. 更新连板追踪
             await limit_tracker.update_today_limit_up(limit_data.get("limit_up", []))
 
-            # 7. 合并信号
-            all_signals = position_signals + risk_signals
+            # 7. 新增交易信号检测
+            open_signals = await open_confirm.analyze_watchlist()
+            breakout_signals = await morning_breakout.analyze_watchlist()
+            stable_signals = await afternoon_stable.analyze_watchlist()
 
-            # 8. 推送告警
+            # 8. 合并信号
+            all_signals = (
+                position_signals
+                + risk_signals
+                + open_signals
+                + breakout_signals
+                + stable_signals
+            )
+
+            # 9. 推送告警
             for signal in all_signals:
                 await alert_pusher.push(signal)
 
-            # 9. 收盘后自动生成复盘报告（15:05）
+            # 10. 收盘后自动生成复盘报告（15:05）
             if now.hour == 15 and now.minute == 5 and not report_generated_today:
                 report = await daily_report_generator.generate_report()
                 await manager.broadcast({
@@ -512,11 +578,7 @@ async def background_monitor_task():
                 report_generated_today = True
                 logger.info("15:05 自动生成当日复盘报告并已推送")
 
-            # 跨日重置标记
-            if now.hour == 0 and now.minute == 0:
-                report_generated_today = False
-
-            # 10. 广播到所有WebSocket客户端
+            # 11. 广播到所有WebSocket客户端
             await manager.broadcast({
                 "type": "market_update",
                 "timestamp": now.isoformat(),
@@ -528,6 +590,13 @@ async def background_monitor_task():
                 "positions": position_summary,
                 "risk": risk_status.model_dump(),
                 "signals": all_signals,
+                "signal_summary": {
+                    "open_confirm": len(open_signals),
+                    "morning_breakout": len(breakout_signals),
+                    "afternoon_stable": len(stable_signals),
+                    "position": len(position_signals),
+                    "risk": len(risk_signals),
+                },
                 "limit": {
                     "limit_up_count": limit_data.get("limit_up_count", len(limit_data.get("limit_up", []))),
                     "limit_down_count": limit_data.get("limit_down_count", len(limit_data.get("limit_down", []))),

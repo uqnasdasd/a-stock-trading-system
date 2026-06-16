@@ -21,6 +21,8 @@ class PositionMonitor:
         self.signals: List[dict] = []
         # 记录已触发的信号状态（防抖）
         self.triggered_signals: Dict[str, dict] = {}
+        # 独立字典存储每只持仓的最高盈利（Pydantic v2兼容）
+        self._max_profit_map: Dict[str, float] = {}
         self._loaded = False
 
     async def _ensure_loaded(self):
@@ -33,6 +35,7 @@ class PositionMonitor:
         """从数据库加载持仓"""
         rows = await db_get_positions()
         self.positions = {}
+        self._max_profit_map = {}
         for row in rows:
             try:
                 position = Position(
@@ -47,6 +50,8 @@ class PositionMonitor:
                     take_profit_price=row.get("take_profit", 0),
                 )
                 self.positions[position.code] = position
+                # 初始化最高盈利记录
+                self._max_profit_map[position.code] = 0.0
             except Exception as e:
                 logger.warning(f"加载持仓 {row.get('code')} 失败: {e}")
         logger.info(f"从数据库加载 {len(self.positions)} 条持仓")
@@ -55,6 +60,8 @@ class PositionMonitor:
         """添加持仓"""
         await self._ensure_loaded()
         self.positions[position.code] = position
+        # 初始化最高盈利记录
+        self._max_profit_map[position.code] = 0.0
         await db_add_position(
             code=position.code,
             name=position.name,
@@ -73,6 +80,9 @@ class PositionMonitor:
         await self._ensure_loaded()
         if code in self.positions:
             del self.positions[code]
+            # 同时移除最高盈利记录
+            if code in self._max_profit_map:
+                del self._max_profit_map[code]
             await db_remove_position(code)
             # 清除该持仓的信号记录
             keys_to_remove = [k for k in self.triggered_signals if k.startswith(code)]
@@ -155,31 +165,30 @@ class PositionMonitor:
                 })
                 self._mark_triggered(signal_key)
 
-        # 移动止盈：盈利从高点回落到2%
-        if hasattr(position, '_max_profit'):
-            if position._max_profit - profit_pct >= 0.03 and profit_pct > 0.02:
-                signal_key = f"{position.code}_trailing_stop"
-                if not self._is_triggered(signal_key):
-                    signals.append({
-                        "type": SignalType.TAKE_PROFIT,
-                        "level": AlertLevel.IMPORTANT,
-                        "code": position.code,
-                        "name": position.name,
-                        "message": f"移动止盈触发！{position.name} 盈利从高点{position._max_profit*100:.1f}%回落至{profit_pct*100:.1f}%",
-                        "trigger_price": quote.price,
-                        "trigger_condition": "盈利从高点回落3%",
-                        "suggested_action": "清仓剩余仓位",
-                        "timestamp": datetime.now().isoformat(),
-                        "id": f"{position.code}_ts_{datetime.now().strftime('%H%M%S')}",
-                        "is_read": False,
-                    })
-                    self._mark_triggered(signal_key)
-        else:
-            position._max_profit = profit_pct
+        # 移动止盈：盈利从高点回落3%
+        max_profit = self._max_profit_map.get(position.code, 0.0)
+
+        if max_profit > 0 and max_profit - profit_pct >= 0.03 and profit_pct > 0.02:
+            signal_key = f"{position.code}_trailing_stop"
+            if not self._is_triggered(signal_key):
+                signals.append({
+                    "type": SignalType.TAKE_PROFIT,
+                    "level": AlertLevel.IMPORTANT,
+                    "code": position.code,
+                    "name": position.name,
+                    "message": f"移动止盈触发！{position.name} 盈利从高点{max_profit*100:.1f}%回落至{profit_pct*100:.1f}%",
+                    "trigger_price": quote.price,
+                    "trigger_condition": "盈利从高点回落3%",
+                    "suggested_action": "清仓剩余仓位",
+                    "timestamp": datetime.now().isoformat(),
+                    "id": f"{position.code}_ts_{datetime.now().strftime('%H%M%S')}",
+                    "is_read": False,
+                })
+                self._mark_triggered(signal_key)
 
         # 更新最大盈利
-        if profit_pct > getattr(position, '_max_profit', 0):
-            position._max_profit = profit_pct
+        if profit_pct > max_profit:
+            self._max_profit_map[position.code] = profit_pct
 
         return signals
 

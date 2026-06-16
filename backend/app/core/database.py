@@ -109,6 +109,25 @@ async def init_db():
             )
         """)
 
+        # risk_control 风控数据表
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS risk_control (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                date TEXT NOT NULL,
+                week_start TEXT NOT NULL,
+                daily_trades_json TEXT NOT NULL DEFAULT '[]',
+                weekly_trades_json TEXT NOT NULL DEFAULT '[]',
+                daily_pnl REAL NOT NULL DEFAULT 0,
+                weekly_pnl REAL NOT NULL DEFAULT 0,
+                is_locked INTEGER NOT NULL DEFAULT 0,
+                lock_reason TEXT DEFAULT NULL,
+                lock_until TEXT DEFAULT NULL,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(date)
+            )
+        """)
+
         await db.commit()
         logger.info("数据库初始化完成，所有表已创建")
     finally:
@@ -581,5 +600,108 @@ async def db_clear_auction_volume(date: Optional[str] = None) -> dict:
             await db.execute("DELETE FROM auction_volume")
         await db.commit()
         return {"status": "success"}
+    finally:
+        await db.close()
+
+
+# ==================== Risk Control CRUD ====================
+
+async def db_save_risk_control(
+    date: str,
+    week_start: str,
+    daily_trades: List[dict],
+    weekly_trades: List[dict],
+    daily_pnl: float,
+    weekly_pnl: float,
+    is_locked: bool = False,
+    lock_reason: Optional[str] = None,
+    lock_until: Optional[str] = None,
+) -> dict:
+    """保存风控数据"""
+    daily_trades_json = json.dumps(daily_trades, ensure_ascii=False, default=str)
+    weekly_trades_json = json.dumps(weekly_trades, ensure_ascii=False, default=str)
+    now = datetime.now().isoformat()
+    db = await get_db()
+    try:
+        await db.execute(
+            """
+            INSERT OR REPLACE INTO risk_control
+            (date, week_start, daily_trades_json, weekly_trades_json, daily_pnl, weekly_pnl,
+             is_locked, lock_reason, lock_until, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                date, week_start, daily_trades_json, weekly_trades_json,
+                daily_pnl, weekly_pnl,
+                1 if is_locked else 0, lock_reason, lock_until, now,
+            ),
+        )
+        await db.commit()
+        return {"status": "success", "date": date}
+    finally:
+        await db.close()
+
+
+async def db_get_risk_control(date: str) -> Optional[dict]:
+    """获取指定日期的风控数据"""
+    db = await get_db()
+    try:
+        cursor = await db.execute(
+            "SELECT * FROM risk_control WHERE date = ?", (date,)
+        )
+        row = await cursor.fetchone()
+        if row:
+            data = dict(row)
+            data["daily_trades"] = json.loads(data["daily_trades_json"])
+            data["weekly_trades"] = json.loads(data["weekly_trades_json"])
+            del data["daily_trades_json"]
+            del data["weekly_trades_json"]
+            data["is_locked"] = bool(data["is_locked"])
+            return data
+        return None
+    finally:
+        await db.close()
+
+
+async def db_get_latest_risk_control() -> Optional[dict]:
+    """获取最新的风控数据"""
+    db = await get_db()
+    try:
+        cursor = await db.execute(
+            "SELECT * FROM risk_control ORDER BY date DESC LIMIT 1"
+        )
+        row = await cursor.fetchone()
+        if row:
+            data = dict(row)
+            data["daily_trades"] = json.loads(data["daily_trades_json"])
+            data["weekly_trades"] = json.loads(data["weekly_trades_json"])
+            del data["daily_trades_json"]
+            del data["weekly_trades_json"]
+            data["is_locked"] = bool(data["is_locked"])
+            return data
+        return None
+    finally:
+        await db.close()
+
+
+async def db_get_risk_control_by_week(week_start: str) -> List[dict]:
+    """获取本周所有风控数据"""
+    db = await get_db()
+    try:
+        cursor = await db.execute(
+            "SELECT * FROM risk_control WHERE week_start = ? ORDER BY date",
+            (week_start,),
+        )
+        rows = await cursor.fetchall()
+        result = []
+        for row in rows:
+            data = dict(row)
+            data["daily_trades"] = json.loads(data["daily_trades_json"])
+            data["weekly_trades"] = json.loads(data["weekly_trades_json"])
+            del data["daily_trades_json"]
+            del data["weekly_trades_json"]
+            data["is_locked"] = bool(data["is_locked"])
+            result.append(data)
+        return result
     finally:
         await db.close()
