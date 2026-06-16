@@ -1,5 +1,5 @@
 """API路由"""
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Request, Body
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Request, Body, HTTPException
 from fastapi.responses import JSONResponse
 from typing import List, Optional
 from datetime import datetime

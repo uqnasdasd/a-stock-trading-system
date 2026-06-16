@@ -302,21 +302,23 @@ const Dashboard: React.FC = () => {
     const positions = data?.positions
     const risk = data?.risk
     const auction = data?.auction
+    const limit = data?.limit
+    const indices = data?.indices
 
-    // 计算市场情绪
-    const upCount = positions?.up_count ?? 0
-    const downCount = positions?.down_count ?? 0
-    const limitUp = positions?.limit_up_count ?? 0
-    const limitDown = positions?.limit_down_count ?? 0
+    // 计算市场情绪（从indices或limit数据获取）
+    const upCount = indices?.reduce((sum: number, idx: any) => sum + (idx.change_pct > 0 ? 1 : 0), 0) ?? limit?.limit_up_count ?? 0
+    const downCount = indices?.reduce((sum: number, idx: any) => sum + (idx.change_pct < 0 ? 1 : 0), 0) ?? limit?.limit_down_count ?? 0
+    const limitUp = limit?.limit_up_count ?? 0
+    const limitDown = limit?.limit_down_count ?? 0
     const total = upCount + downCount || 1
     const sentimentScore = Math.round(((upCount - downCount) / total) * 100 + 50)
     const clampedScore = Math.max(0, Math.min(100, sentimentScore))
 
     // 板块强度TOP5（从auction数据中提取）
-    const sectors = auction?.sectors?.slice(0, 5) ?? []
+    const sectors = auction?.sector_strengths?.slice(0, 5) ?? []
 
     // 龙头竞价评分（从auction数据中提取）
-    const dragons = auction?.dragons?.slice(0, 5) ?? []
+    const dragons = auction?.leader_scores?.slice(0, 5) ?? []
 
     return (
       <div className={styles.overviewGrid}>

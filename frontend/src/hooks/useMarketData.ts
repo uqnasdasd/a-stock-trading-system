@@ -7,6 +7,7 @@ interface MarketData {
   positions?: any
   signals?: any[]
   risk?: any
+  limit?: any
   timestamp?: string
 }
 
@@ -63,11 +64,13 @@ export function useMarketData() {
     isFetchingRef.current = true
     try {
       setIsLoading(true)
-      const [indicesRes, riskRes, positionsRes, signalsRes] = await Promise.all([
+      const [indicesRes, riskRes, positionsRes, signalsRes, auctionRes, limitRes] = await Promise.all([
         fetch(`/api/market/indices`).then(r => r.json()).catch(() => null),
         fetch(`/api/risk/status`).then(r => r.json()).catch(() => null),
         fetch(`/api/positions`).then(r => r.json()).catch(() => null),
         fetch(`/api/signals`).then(r => r.json()).catch(() => null),
+        fetch(`/api/auction/analyze`).then(r => r.json()).catch(() => null),
+        fetch(`/api/limit/stocks`).then(r => r.json()).catch(() => null),
       ])
 
       const newSignals = signalsRes?.signals || []
@@ -81,6 +84,8 @@ export function useMarketData() {
           risk: riskRes?.status || prev?.risk,
           positions: positionsRes || prev?.positions,
           signals: newSignals,
+          auction: auctionRes || prev?.auction,
+          limit: limitRes || prev?.limit,
           timestamp: new Date().toISOString(),
         }
         return next
