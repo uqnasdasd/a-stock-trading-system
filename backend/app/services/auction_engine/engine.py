@@ -1,4 +1,4 @@
-"""竞价引擎 - 核心模块M1"""
+"""竞价引擎 - 核心模块M1（板块映射动态化版）"""
 from typing import Dict, List, Optional
 from datetime import datetime, time
 from loguru import logger
@@ -10,8 +10,8 @@ from app.core.database import (
 )
 
 
-# 板块映射 - 扩展版，覆盖更多热门板块和龙头个股
-SECTOR_MAP = {
+# 默认板块映射（作为回退，当东方财富接口不可用时使用）
+DEFAULT_SECTOR_MAP = {
     # 新能源
     "光伏": ["sh600438", "sz002459", "sh601012", "sz300274", "sh688599", "sz002129", "sh600732"],
     "锂电池": ["sz002594", "sz300014", "sz002709", "sh603659", "sz002460", "sh600884", "sz300073"],
@@ -44,43 +44,117 @@ SECTOR_MAP = {
 
 
 class AuctionEngine:
-    """竞价引擎"""
+    """竞价引擎 - 支持动态板块映射"""
 
     def __init__(self):
         self.sector_data: Dict[str, List[StockQuote]] = {}
         self.leader_scores: List[LeaderScore] = []
         self.sector_strengths: List[SectorStrength] = []
         self.yesterday_limit_up: List[str] = []  # 昨日涨停股列表
+        # 动态板块数据
+        self._sector_map: Dict[str, List[str]] = {}
+        self._sector_map_cache_time: Optional[datetime] = None
+        self._hot_sectors: List[dict] = []
+        self._hot_sectors_cache_time: Optional[datetime] = None
+
+    async def _get_sector_map(self) -> Dict[str, List[str]]:
+        """获取板块映射（优先从东方财富动态获取，失败时使用默认映射）"""
+        now = datetime.now()
+        if (self._sector_map and self._sector_map_cache_time and
+            (now - self._sector_map_cache_time).seconds < 600):
+            return self._sector_map
+
+        # 尝试从东方财富获取热门板块及其成分股
+        try:
+            hot_sectors = await collector.get_hot_sectors_from_eastmoney()
+            if hot_sectors:
+                sector_map = {}
+                # 取涨幅前20的板块
+                top_sectors = sorted(hot_sectors, key=lambda x: x.get("change_pct", 0), reverse=True)[:20]
+
+                for sector in top_sectors:
+                    sector_code = sector.get("code", "")
+                    sector_name = sector.get("name", "")
+                    if not sector_code or not sector_name:
+                        continue
+
+                    # 获取板块成分股
+                    stocks = await collector.get_sector_stocks_from_eastmoney(sector_code)
+                    if stocks:
+                        codes = [s["code"] for s in stocks if s.get("code")]
+                        if codes:
+                            sector_map[sector_name] = codes
+
+                if sector_map:
+                    self._sector_map = sector_map
+                    self._sector_map_cache_time = now
+                    logger.info(f"动态获取板块映射成功: {len(sector_map)} 个板块")
+                    return sector_map
+        except Exception as e:
+            logger.warning(f"动态获取板块映射失败: {e}")
+
+        # 回退到默认映射
+        self._sector_map = DEFAULT_SECTOR_MAP.copy()
+        self._sector_map_cache_time = now
+        logger.info("使用默认板块映射")
+        return self._sector_map
+
+    async def _get_hot_sectors(self) -> List[dict]:
+        """获取热门板块排行（带缓存）"""
+        now = datetime.now()
+        if (self._hot_sectors and self._hot_sectors_cache_time and
+            (now - self._hot_sectors_cache_time).seconds < 300):
+            return self._hot_sectors
+
+        try:
+            sectors = await collector.get_hot_sectors_from_eastmoney()
+            if sectors:
+                # 按涨跌幅排序，取前15
+                self._hot_sectors = sorted(
+                    sectors, key=lambda x: x.get("change_pct", 0), reverse=True
+                )[:15]
+                self._hot_sectors_cache_time = now
+                return self._hot_sectors
+        except Exception as e:
+            logger.warning(f"获取热门板块失败: {e}")
+
+        return []
 
     async def run_auction_analysis(self, watchlist: List[str]) -> dict:
         """运行竞价分析"""
         logger.info("开始竞价分析...")
 
-        # 1. 获取所有关注股票的竞价数据
-        all_codes = self._get_all_codes(watchlist)
+        # 1. 获取板块映射（动态化）
+        sector_map = await self._get_sector_map()
+
+        # 2. 获取所有关注股票的竞价数据
+        all_codes = self._get_all_codes(watchlist, sector_map)
         quotes = await collector.get_quotes(all_codes)
 
         if not quotes:
             logger.warning("未获取到竞价数据")
             return {"error": "无数据"}
 
-        # 2. 按板块分组
-        self._group_by_sector(quotes)
+        # 3. 按板块分组
+        self._group_by_sector(quotes, sector_map)
 
-        # 3. 计算板块强度
+        # 4. 计算板块强度
         self.sector_strengths = self._calculate_sector_strength()
 
-        # 4. 计算龙头评分
+        # 5. 计算龙头评分
         self.leader_scores = self._calculate_leader_scores()
 
-        # 5. 计算情绪晴雨表
+        # 6. 计算情绪晴雨表
         emotion = self._calculate_emotion(quotes)
 
-        # 6. 筛选潜力标的
+        # 7. 筛选潜力标的
         candidates = self._filter_candidates()
 
-        # 7. 获取竞价量能数据
+        # 8. 获取竞价量能数据
         auction_volume_data = await self._get_auction_volume_data(quotes)
+
+        # 9. 获取热门板块信息
+        hot_sectors = await self._get_hot_sectors()
 
         return {
             "timestamp": datetime.now().isoformat(),
@@ -93,19 +167,20 @@ class AuctionEngine:
             "emotion": emotion,
             "candidates": candidates,
             "auction_volume": auction_volume_data,
+            "hot_sectors": hot_sectors[:10],
         }
 
-    def _get_all_codes(self, watchlist: List[str]) -> List[str]:
+    def _get_all_codes(self, watchlist: List[str], sector_map: Dict[str, List[str]]) -> List[str]:
         """获取所有需要监控的股票代码"""
         all_codes = set(watchlist)
-        for codes in SECTOR_MAP.values():
+        for codes in sector_map.values():
             all_codes.update(codes)
         return list(all_codes)
 
-    def _group_by_sector(self, quotes: Dict[str, StockQuote]):
+    def _group_by_sector(self, quotes: Dict[str, StockQuote], sector_map: Dict[str, List[str]]):
         """按板块分组"""
         self.sector_data = {}
-        for sector_name, codes in SECTOR_MAP.items():
+        for sector_name, codes in sector_map.items():
             self.sector_data[sector_name] = []
             for code in codes:
                 if code in quotes:
@@ -367,6 +442,47 @@ class AuctionEngine:
             logger.debug(f"记录竞价量能: {name}({code}) {minute} 成交量:{volume}")
         except Exception as e:
             logger.warning(f"记录竞价量能失败 {code}: {e}")
+
+    async def get_sector_detail(self, sector_name: str) -> Optional[dict]:
+        """获取板块详细信息（含实时成分股）"""
+        sector_map = await self._get_sector_map()
+        codes = sector_map.get(sector_name, [])
+        if not codes:
+            return None
+
+        quotes = await collector.get_quotes(codes)
+        stocks = []
+        for code in codes:
+            if code in quotes:
+                q = quotes[code]
+                stocks.append({
+                    "code": q.code,
+                    "name": q.name,
+                    "price": q.price,
+                    "change_pct": q.change_pct,
+                    "volume": q.volume,
+                    "amount": q.amount,
+                })
+
+        stocks.sort(key=lambda x: x["change_pct"], reverse=True)
+
+        return {
+            "sector_name": sector_name,
+            "stock_count": len(stocks),
+            "stocks": stocks,
+            "avg_change_pct": round(sum(s["change_pct"] for s in stocks) / len(stocks), 2) if stocks else 0,
+            "leader": stocks[0] if stocks else None,
+        }
+
+    async def refresh_sector_map(self):
+        """手动刷新板块映射"""
+        self._sector_map = {}
+        self._sector_map_cache_time = None
+        self._hot_sectors = []
+        self._hot_sectors_cache_time = None
+        await self._get_sector_map()
+        await self._get_hot_sectors()
+        logger.info("板块映射已手动刷新")
 
 
 # 单例
