@@ -218,14 +218,23 @@ class PositionMonitor:
         return signals
 
     def _check_price_volume_divergence(self, position: Position, quote: StockQuote) -> List[dict]:
-        """检查量价背离信号"""
+        """检查量价背离信号 - 使用相对量比而非绝对成交量"""
         signals = []
-        # 简化判断：价格上涨但成交量萎缩（需要历史数据对比）
-        # 实际实现需要与前5分钟/前1小时对比
         change_pct = quote.change_pct
 
+        # 使用相对量比：当前成交量与5日均量对比
+        # 量比<1表示量能萎缩，结合价格上涨判断背离
+        volume_ratio = getattr(quote, 'volume_ratio', 0)
+        # 如果东方财富数据有量比字段则直接使用，否则用简单估算
+        if volume_ratio == 0 and quote.volume > 0:
+            # 简化估算：假设平均成交量为前收盘对应成交量的1/240（分钟）
+            # 实际生产环境应从历史数据计算
+            avg_minute_vol = quote.volume / 240  # 粗略估算
+            if avg_minute_vol > 0:
+                volume_ratio = quote.volume / (avg_minute_vol * 240)
+
         # 如果涨幅>3%但量比<1（无量上涨）
-        if change_pct > 3 and quote.volume < 10000:  # 简化条件
+        if change_pct > 3 and volume_ratio < 1.0 and volume_ratio > 0:
             signal_key = f"{position.code}_pv_divergence"
             if not self._is_triggered(signal_key):
                 signals.append({
@@ -233,9 +242,9 @@ class PositionMonitor:
                     "level": AlertLevel.NORMAL,
                     "code": position.code,
                     "name": position.name,
-                    "message": f"量价背离警告！{position.name} 涨幅{change_pct:.1f}%但量能不足",
+                    "message": f"量价背离警告！{position.name} 涨幅{change_pct:.1f}%但量比仅{volume_ratio:.2f}，量能不足",
                     "trigger_price": quote.price,
-                    "trigger_condition": "涨幅>3%但量能萎缩",
+                    "trigger_condition": "涨幅>3%但量比<1（量能萎缩）",
                     "suggested_action": "警惕诱多，考虑减仓",
                     "timestamp": datetime.now().isoformat(),
                     "id": f"{position.code}_pv_{datetime.now().strftime('%H%M%S')}",

@@ -345,23 +345,24 @@ class RiskController:
         return signals
 
     def _check_overnight_risk(self) -> List[dict]:
-        """检查隔夜风险（收盘前30分钟提醒）"""
+        """检查隔夜风险（收盘前30分钟提醒）- 只对盈利持仓告警"""
         signals = []
         now = datetime.now()
 
         # 只在收盘前30分钟检查 (14:30-15:00)
         if now.hour == 14 and now.minute >= 30:
             for code, position in self.positions.items():
-                # 检查是否非涨停（简化：涨幅<9.5%）
                 profit_pct = position.profit_pct
-                if profit_pct < 9.5:
+                # 修复：只对盈利持仓进行隔夜风控告警
+                # 亏损持仓已在止损逻辑中处理，不应重复告警
+                if profit_pct > 0 and profit_pct < 9.5:
                     signals.append({
                         "type": SignalType.RISK_ALERT,
                         "level": AlertLevel.NORMAL,
                         "code": code,
                         "name": position.name,
-                        "message": f"隔夜风险提示：{position.name} 当前盈利{profit_pct:.1f}%，未涨停，建议收盘前清仓",
-                        "trigger_condition": "非涨停持仓+收盘前30分钟",
+                        "message": f"隔夜风险提示：{position.name} 当前盈利{profit_pct:.1f}%，未涨停，建议收盘前清仓锁定利润",
+                        "trigger_condition": "盈利持仓+未涨停+收盘前30分钟",
                         "suggested_action": "收盘前清仓，规避隔夜风险",
                         "timestamp": datetime.now().isoformat(),
                         "id": f"{code}_overnight_{datetime.now().strftime('%H%M%S')}",

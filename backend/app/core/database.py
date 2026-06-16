@@ -1,4 +1,4 @@
-"""异步SQLite数据库模块 - 使用aiosqlite"""
+"""异步SQLite数据库模块 - 使用aiosqlite，支持连接池"""
 import aiosqlite
 import json
 from typing import List, Optional, Dict, Any
@@ -11,13 +11,28 @@ from app.core.config import settings
 
 DB_PATH = Path(settings.database_url.replace("sqlite:///", ""))
 
+# 全局数据库连接池（单连接复用）
+_db_pool: Optional[aiosqlite.Connection] = None
+
 
 async def get_db() -> aiosqlite.Connection:
-    """获取数据库连接"""
+    """获取数据库连接（连接池模式）"""
+    global _db_pool
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    db = await aiosqlite.connect(str(DB_PATH))
-    db.row_factory = aiosqlite.Row
-    return db
+    if _db_pool is None:
+        _db_pool = await aiosqlite.connect(str(DB_PATH))
+        _db_pool.row_factory = aiosqlite.Row
+        logger.info("数据库连接池初始化完成")
+    return _db_pool
+
+
+async def close_db_pool():
+    """关闭数据库连接池"""
+    global _db_pool
+    if _db_pool is not None:
+        await _db_pool.close()
+        _db_pool = None
+        logger.info("数据库连接池已关闭")
 
 
 async def init_db():
@@ -131,7 +146,7 @@ async def init_db():
         await db.commit()
         logger.info("数据库初始化完成，所有表已创建")
     finally:
-        await db.close()
+        pass  # 连接池模式不关闭连接
 
 
 # ==================== Positions CRUD ====================
@@ -164,7 +179,7 @@ async def db_add_position(
         await db.commit()
         return {"status": "success", "code": code, "name": name}
     finally:
-        await db.close()
+        pass  # 连接池模式不关闭连接
 
 
 async def db_remove_position(code: str) -> dict:
@@ -175,7 +190,7 @@ async def db_remove_position(code: str) -> dict:
         await db.commit()
         return {"status": "success", "code": code}
     finally:
-        await db.close()
+        pass
 
 
 async def db_get_positions() -> List[dict]:
@@ -186,7 +201,7 @@ async def db_get_positions() -> List[dict]:
         rows = await cursor.fetchall()
         return [dict(row) for row in rows]
     finally:
-        await db.close()
+        pass
 
 
 async def db_update_position_price(code: str, current_price: float) -> dict:
@@ -200,7 +215,7 @@ async def db_update_position_price(code: str, current_price: float) -> dict:
         await db.commit()
         return {"status": "success", "code": code, "current_price": current_price}
     finally:
-        await db.close()
+        pass
 
 
 # ==================== Watchlist CRUD ====================
@@ -218,7 +233,7 @@ async def db_add_watchlist(code: str, name: str) -> dict:
         await db.commit()
         return {"status": "success", "code": code, "name": name, "add_time": add_time}
     finally:
-        await db.close()
+        pass
 
 
 async def db_remove_watchlist(code: str) -> dict:
@@ -230,7 +245,7 @@ async def db_remove_watchlist(code: str) -> dict:
         await db.commit()
         return {"status": "success", "code": code}
     finally:
-        await db.close()
+        pass
 
 
 async def db_get_watchlist() -> List[dict]:
@@ -241,7 +256,7 @@ async def db_get_watchlist() -> List[dict]:
         rows = await cursor.fetchall()
         return [dict(row) for row in rows]
     finally:
-        await db.close()
+        pass
 
 
 # ==================== Trade Logs CRUD ====================
@@ -272,7 +287,7 @@ async def db_add_trade_log(
         await db.commit()
         return {"status": "success", "time": time, "code": code, "action": action}
     finally:
-        await db.close()
+        pass
 
 
 async def db_get_trade_logs(
@@ -319,7 +334,7 @@ async def db_get_trade_logs(
             "logs": [dict(row) for row in rows],
         }
     finally:
-        await db.close()
+        pass
 
 
 async def db_get_today_trade_logs() -> List[dict]:
@@ -334,7 +349,7 @@ async def db_get_today_trade_logs() -> List[dict]:
         rows = await cursor.fetchall()
         return [dict(row) for row in rows]
     finally:
-        await db.close()
+        pass
 
 
 async def db_get_trade_log_stats() -> dict:
@@ -379,7 +394,7 @@ async def db_get_trade_log_stats() -> dict:
             "today_cancel": cancel_row["cancel"] if cancel_row else 0,
         }
     finally:
-        await db.close()
+        pass
 
 
 # ==================== Daily Reports CRUD ====================
@@ -400,7 +415,7 @@ async def db_save_daily_report(date: str, data: dict) -> dict:
         await db.commit()
         return {"status": "success", "date": date}
     finally:
-        await db.close()
+        pass
 
 
 async def db_get_daily_report(date: str) -> Optional[dict]:
@@ -418,7 +433,7 @@ async def db_get_daily_report(date: str) -> Optional[dict]:
             return data
         return None
     finally:
-        await db.close()
+        pass
 
 
 async def db_get_last_daily_report() -> Optional[dict]:
@@ -436,7 +451,7 @@ async def db_get_last_daily_report() -> Optional[dict]:
             return data
         return None
     finally:
-        await db.close()
+        pass
 
 
 # ==================== Settings CRUD ====================
@@ -452,7 +467,7 @@ async def db_set_setting(key: str, value: str) -> dict:
         await db.commit()
         return {"status": "success", "key": key, "value": value}
     finally:
-        await db.close()
+        pass
 
 
 async def db_get_setting(key: str, default: Optional[str] = None) -> Optional[str]:
@@ -465,7 +480,7 @@ async def db_get_setting(key: str, default: Optional[str] = None) -> Optional[st
         row = await cursor.fetchone()
         return row["value"] if row else default
     finally:
-        await db.close()
+        pass
 
 
 async def db_get_all_settings() -> Dict[str, str]:
@@ -476,7 +491,7 @@ async def db_get_all_settings() -> Dict[str, str]:
         rows = await cursor.fetchall()
         return {row["key"]: row["value"] for row in rows}
     finally:
-        await db.close()
+        pass
 
 
 # ==================== Limit Tracker CRUD ====================
@@ -496,7 +511,7 @@ async def db_save_limit_tracker(code: str, name: str, continuous_days: int, last
         await db.commit()
         return {"status": "success", "code": code}
     finally:
-        await db.close()
+        pass
 
 
 async def db_get_limit_tracker(code: str) -> Optional[dict]:
@@ -513,7 +528,7 @@ async def db_get_limit_tracker(code: str) -> Optional[dict]:
             return data
         return None
     finally:
-        await db.close()
+        pass
 
 
 async def db_get_all_limit_trackers(min_days: int = 1) -> List[dict]:
@@ -532,7 +547,7 @@ async def db_get_all_limit_trackers(min_days: int = 1) -> List[dict]:
             result.append(data)
         return result
     finally:
-        await db.close()
+        pass
 
 
 async def db_reset_limit_tracker() -> dict:
@@ -543,7 +558,7 @@ async def db_reset_limit_tracker() -> dict:
         await db.commit()
         return {"status": "success"}
     finally:
-        await db.close()
+        pass
 
 
 # ==================== Auction Volume CRUD ====================
@@ -571,7 +586,7 @@ async def db_save_auction_volume(
         await db.commit()
         return {"status": "success", "code": code, "minute": minute}
     finally:
-        await db.close()
+        pass
 
 
 async def db_get_auction_volume(code: str, date: Optional[str] = None) -> List[dict]:
@@ -587,7 +602,7 @@ async def db_get_auction_volume(code: str, date: Optional[str] = None) -> List[d
         rows = await cursor.fetchall()
         return [dict(row) for row in rows]
     finally:
-        await db.close()
+        pass
 
 
 async def db_clear_auction_volume(date: Optional[str] = None) -> dict:
@@ -601,7 +616,7 @@ async def db_clear_auction_volume(date: Optional[str] = None) -> dict:
         await db.commit()
         return {"status": "success"}
     finally:
-        await db.close()
+        pass
 
 
 # ==================== Risk Control CRUD ====================
@@ -639,7 +654,7 @@ async def db_save_risk_control(
         await db.commit()
         return {"status": "success", "date": date}
     finally:
-        await db.close()
+        pass
 
 
 async def db_get_risk_control(date: str) -> Optional[dict]:
@@ -660,7 +675,7 @@ async def db_get_risk_control(date: str) -> Optional[dict]:
             return data
         return None
     finally:
-        await db.close()
+        pass
 
 
 async def db_get_latest_risk_control() -> Optional[dict]:
@@ -681,7 +696,7 @@ async def db_get_latest_risk_control() -> Optional[dict]:
             return data
         return None
     finally:
-        await db.close()
+        pass
 
 
 async def db_get_risk_control_by_week(week_start: str) -> List[dict]:
@@ -704,4 +719,4 @@ async def db_get_risk_control_by_week(week_start: str) -> List[dict]:
             result.append(data)
         return result
     finally:
-        await db.close()
+        pass

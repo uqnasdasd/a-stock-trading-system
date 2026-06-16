@@ -1,12 +1,17 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 
 interface BacktestParams {
+  code: string
   buyCondition: string
   sellCondition: string
   holdPeriod: number
   startDate: string
   endDate: string
   initialCapital: number
+  stopLossPct: number
+  takeProfitPct: number
+  maPeriod: number
+  volumeRatioThreshold: number
 }
 
 interface BacktestTrade {
@@ -17,128 +22,163 @@ interface BacktestTrade {
   price: number
   volume: number
   pnl?: number
+  pnlPct?: number
+  reason?: string
 }
 
 interface BacktestResult {
   totalReturn: number
   maxDrawdown: number
   winRate: number
+  profitLossRatio: number
   tradeCount: number
   profitTrades: number
   lossTrades: number
   finalCapital: number
+  annualizedReturn: number
+  sharpeRatio: number
   equityCurve: { date: string; value: number }[]
+  drawdownCurve: { date: string; value: number }[]
   trades: BacktestTrade[]
 }
 
+interface StrategyCompare {
+  strategy_name: string
+  result: BacktestResult
+}
+
 const defaultParams: BacktestParams = {
-  buyCondition: '突破5日均线且成交量放大1.5倍',
-  sellCondition: '跌破止损线-3%或达到止盈4%',
-  holdPeriod: 3,
+  code: 'sh600519',
+  buyCondition: 'ma_break',
+  sellCondition: 'stop_profit_loss',
+  holdPeriod: 5,
   startDate: '2024-01-01',
   endDate: '2024-06-01',
   initialCapital: 100000,
+  stopLossPct: 3,
+  takeProfitPct: 5,
+  maPeriod: 5,
+  volumeRatioThreshold: 1.5,
 }
+
+const conditionOptions = [
+  { value: 'ma_break', label: '突破均线+放量' },
+  { value: 'ma_support', label: '回踩均线支撑' },
+  { value: 'limit_up_break', label: '涨停突破' },
+  { value: 'volume_price_rise', label: '量价齐升' },
+]
+
+const sellConditionOptions = [
+  { value: 'stop_profit_loss', label: '固定止盈止损' },
+  { value: 'ma_break', label: '跌破均线' },
+  { value: 'trailing_stop', label: '移动止盈' },
+]
 
 const BacktestPanel: React.FC = () => {
   const [params, setParams] = useState<BacktestParams>(defaultParams)
   const [result, setResult] = useState<BacktestResult | null>(null)
+  const [compareResults, setCompareResults] = useState<StrategyCompare[] | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [activeTab, setActiveTab] = useState<'result' | 'compare'>('result')
+  const equityRef = useRef<HTMLCanvasElement>(null)
+  const drawdownRef = useRef<HTMLCanvasElement>(null)
 
   const runBacktest = useCallback(async () => {
     setLoading(true)
     setError('')
+    setCompareResults(null)
+    setActiveTab('result')
     try {
       const res = await fetch('/api/backtest/run', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(params),
+        body: JSON.stringify({
+          code: params.code,
+          buy_condition: params.buyCondition,
+          sell_condition: params.sellCondition,
+          hold_period: params.holdPeriod,
+          start_date: params.startDate,
+          end_date: params.endDate,
+          initial_capital: params.initialCapital,
+          stop_loss_pct: params.stopLossPct / 100,
+          take_profit_pct: params.takeProfitPct / 100,
+          ma_period: params.maPeriod,
+          volume_ratio_threshold: params.volumeRatioThreshold,
+        }),
       })
       if (!res.ok) throw new Error('回测请求失败')
       const json = await res.json()
       if (json.result) {
         setResult(json.result)
       } else {
-        // 模拟数据演示
-        generateMockResult()
+        throw new Error('回测结果为空')
       }
-    } catch (e) {
-      console.warn('回测API调用失败，使用模拟数据:', e)
-      generateMockResult()
+    } catch (e: any) {
+      setError(e.message || '回测失败')
+      console.warn('回测API调用失败:', e)
     } finally {
       setLoading(false)
     }
   }, [params])
 
-  const generateMockResult = () => {
-    const curve: { date: string; value: number }[] = []
-    let capital = params.initialCapital
-    const trades: BacktestTrade[] = []
-    const start = new Date(params.startDate)
-    const end = new Date(params.endDate)
-    const totalDays = Math.max(1, Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)))
-
-    for (let i = 0; i <= totalDays; i++) {
-      const d = new Date(start)
-      d.setDate(d.getDate() + i)
-      if (d.getDay() === 0 || d.getDay() === 6) continue
-      const change = (Math.random() - 0.48) * 0.02
-      capital = capital * (1 + change)
-      curve.push({
-        date: d.toISOString().slice(0, 10),
-        value: Math.round(capital * 100) / 100,
+  const runCompare = useCallback(async () => {
+    setLoading(true)
+    setError('')
+    setResult(null)
+    setActiveTab('compare')
+    try {
+      const strategies = [
+        { name: '突破均线+放量', buy_condition: 'ma_break', sell_condition: 'stop_profit_loss', hold_period: 5 },
+        { name: '回踩均线支撑', buy_condition: 'ma_support', sell_condition: 'stop_profit_loss', hold_period: 3 },
+        { name: '量价齐升', buy_condition: 'volume_price_rise', sell_condition: 'trailing_stop', hold_period: 5 },
+      ]
+      const res = await fetch('/api/backtest/compare', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: params.code,
+          start_date: params.startDate,
+          end_date: params.endDate,
+          strategies,
+        }),
       })
+      if (!res.ok) throw new Error('对比请求失败')
+      const json = await res.json()
+      if (json.results) {
+        setCompareResults(json.results)
+      } else {
+        throw new Error('对比结果为空')
+      }
+    } catch (e: any) {
+      setError(e.message || '对比失败')
+    } finally {
+      setLoading(false)
     }
+  }, [params])
 
-    const tradeCount = Math.floor(Math.random() * 30) + 10
-    for (let i = 0; i < tradeCount; i++) {
-      const d = new Date(start)
-      d.setDate(d.getDate() + Math.floor(Math.random() * totalDays))
-      const isProfit = Math.random() > 0.45
-      trades.push({
-        date: d.toISOString().slice(0, 10),
-        code: `60${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
-        name: ['贵州茅台', '宁德时代', '比亚迪', '中芯国际', '隆基绿能', '海康威视'][Math.floor(Math.random() * 6)],
-        action: i % 2 === 0 ? 'buy' : 'sell',
-        price: +(Math.random() * 100 + 20).toFixed(2),
-        volume: Math.floor(Math.random() * 10 + 1) * 100,
-        pnl: i % 2 === 1 ? (isProfit ? +(Math.random() * 5).toFixed(2) : -(Math.random() * 3).toFixed(2)) : undefined,
-      })
+  const exportReport = useCallback(() => {
+    if (!result) return
+    const report = {
+      params,
+      result: {
+        ...result,
+        equityCurve: result.equityCurve.slice(0, 10),
+        drawdownCurve: result.drawdownCurve.slice(0, 10),
+      },
+      exportTime: new Date().toISOString(),
     }
+    const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `backtest_report_${params.code}_${params.startDate}_${params.endDate}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }, [result, params])
 
-    const finalValue = curve[curve.length - 1]?.value || params.initialCapital
-    const totalReturn = ((finalValue - params.initialCapital) / params.initialCapital) * 100
-
-    let maxDrawdown = 0
-    let peak = params.initialCapital
-    for (const point of curve) {
-      if (point.value > peak) peak = point.value
-      const dd = ((peak - point.value) / peak) * 100
-      if (dd > maxDrawdown) maxDrawdown = dd
-    }
-
-    const sellTrades = trades.filter(t => t.action === 'sell' && t.pnl !== undefined)
-    const profitTrades = sellTrades.filter(t => (t.pnl || 0) > 0).length
-    const winRate = sellTrades.length > 0 ? (profitTrades / sellTrades.length) * 100 : 0
-
-    setResult({
-      totalReturn: +totalReturn.toFixed(2),
-      maxDrawdown: +maxDrawdown.toFixed(2),
-      winRate: +winRate.toFixed(2),
-      tradeCount,
-      profitTrades,
-      lossTrades: sellTrades.length - profitTrades,
-      finalCapital: +finalValue.toFixed(2),
-      equityCurve: curve,
-      trades: trades.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
-    })
-  }
-
-  useEffect(() => {
-    if (!result?.equityCurve.length || !canvasRef.current) return
-
+  const drawChart = useCallback((canvasRef: React.RefObject<HTMLCanvasElement>, data: { date: string; value: number }[], color: string, title: string) => {
+    if (!data?.length || !canvasRef.current) return
     const canvas = canvasRef.current
     const ctx = canvas.getContext('2d')
     if (!ctx) return
@@ -154,7 +194,7 @@ const BacktestPanel: React.FC = () => {
     const chartW = width - padding.left - padding.right
     const chartH = height - padding.top - padding.bottom
 
-    const values = result.equityCurve.map(d => d.value)
+    const values = data.map(d => d.value)
     const minVal = Math.min(...values) * 0.98
     const maxVal = Math.max(...values) * 1.02
     const valRange = maxVal - minVal || 1
@@ -180,11 +220,11 @@ const BacktestPanel: React.FC = () => {
     }
 
     // Line
-    const step = chartW / (result.equityCurve.length - 1 || 1)
-    ctx.strokeStyle = '#00D4AA'
+    const step = chartW / (data.length - 1 || 1)
+    ctx.strokeStyle = color
     ctx.lineWidth = 2
     ctx.beginPath()
-    result.equityCurve.forEach((point, i) => {
+    data.forEach((point, i) => {
       const x = padding.left + i * step
       const y = padding.top + ((maxVal - point.value) / valRange) * chartH
       if (i === 0) ctx.moveTo(x, y)
@@ -196,25 +236,40 @@ const BacktestPanel: React.FC = () => {
     ctx.lineTo(padding.left + chartW, padding.top + chartH)
     ctx.lineTo(padding.left, padding.top + chartH)
     ctx.closePath()
-    ctx.fillStyle = 'rgba(0, 212, 170, 0.1)'
+    ctx.fillStyle = color.replace(')', ', 0.1)').replace('rgb', 'rgba').replace('#', '')
+    if (color.startsWith('#')) {
+      ctx.fillStyle = color + '1A'
+    }
     ctx.fill()
 
     // X labels
     ctx.fillStyle = '#5A6B87'
     ctx.font = '9px monospace'
     ctx.textAlign = 'center'
-    const xStep = Math.ceil(result.equityCurve.length / 6)
-    for (let i = 0; i < result.equityCurve.length; i += xStep) {
+    const xStep = Math.ceil(data.length / 6)
+    for (let i = 0; i < data.length; i += xStep) {
       const x = padding.left + i * step
-      ctx.fillText(result.equityCurve[i].date.slice(5), x, height - 8)
+      ctx.fillText(data[i].date.slice(5), x, height - 8)
     }
 
     // Title
     ctx.fillStyle = '#E8ECF4'
     ctx.font = 'bold 12px sans-serif'
     ctx.textAlign = 'left'
-    ctx.fillText('收益曲线', padding.left, padding.top - 6)
-  }, [result])
+    ctx.fillText(title, padding.left, padding.top - 6)
+  }, [])
+
+  useEffect(() => {
+    if (result?.equityCurve?.length) {
+      drawChart(equityRef, result.equityCurve, '#00D4AA', '收益曲线')
+    }
+  }, [result?.equityCurve, drawChart])
+
+  useEffect(() => {
+    if (result?.drawdownCurve?.length) {
+      drawChart(drawdownRef, result.drawdownCurve, '#FF6B6B', '回撤曲线')
+    }
+  }, [result?.drawdownCurve, drawChart])
 
   const handleParamChange = (key: keyof BacktestParams, value: string | number) => {
     setParams(prev => ({ ...prev, [key]: value }))
@@ -224,9 +279,14 @@ const BacktestPanel: React.FC = () => {
     <div style={styles.container}>
       <div style={styles.header}>
         <h3 style={styles.title}>策略回测</h3>
-        <button style={styles.runBtn} onClick={runBacktest} disabled={loading}>
-          {loading ? '回测中...' : '运行回测'}
-        </button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button style={styles.runBtn} onClick={runBacktest} disabled={loading}>
+            {loading ? '回测中...' : '运行回测'}
+          </button>
+          <button style={styles.compareBtn} onClick={runCompare} disabled={loading}>
+            多策略对比
+          </button>
+        </div>
       </div>
 
       {error && <div style={styles.error}>{error}</div>}
@@ -236,20 +296,33 @@ const BacktestPanel: React.FC = () => {
         <div style={styles.paramsTitle}>策略参数</div>
         <div style={styles.paramGrid}>
           <div style={styles.paramItem}>
-            <label style={styles.paramLabel}>买入条件</label>
+            <label style={styles.paramLabel}>股票代码</label>
             <input
               style={styles.paramInput}
-              value={params.buyCondition}
-              onChange={e => handleParamChange('buyCondition', e.target.value)}
+              value={params.code}
+              onChange={e => handleParamChange('code', e.target.value)}
+              placeholder="如: sh600519"
             />
           </div>
           <div style={styles.paramItem}>
+            <label style={styles.paramLabel}>买入条件</label>
+            <select
+              style={styles.paramInput}
+              value={params.buyCondition}
+              onChange={e => handleParamChange('buyCondition', e.target.value)}
+            >
+              {conditionOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+          <div style={styles.paramItem}>
             <label style={styles.paramLabel}>卖出条件</label>
-            <input
+            <select
               style={styles.paramInput}
               value={params.sellCondition}
               onChange={e => handleParamChange('sellCondition', e.target.value)}
-            />
+            >
+              {sellConditionOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
           </div>
           <div style={styles.paramItem}>
             <label style={styles.paramLabel}>持仓周期 (天)</label>
@@ -274,6 +347,53 @@ const BacktestPanel: React.FC = () => {
             />
           </div>
           <div style={styles.paramItem}>
+            <label style={styles.paramLabel}>止损比例 (%)</label>
+            <input
+              style={styles.paramInput}
+              type="number"
+              min={1}
+              max={20}
+              step={0.5}
+              value={params.stopLossPct}
+              onChange={e => handleParamChange('stopLossPct', parseFloat(e.target.value) || 3)}
+            />
+          </div>
+          <div style={styles.paramItem}>
+            <label style={styles.paramLabel}>止盈比例 (%)</label>
+            <input
+              style={styles.paramInput}
+              type="number"
+              min={1}
+              max={50}
+              step={0.5}
+              value={params.takeProfitPct}
+              onChange={e => handleParamChange('takeProfitPct', parseFloat(e.target.value) || 5)}
+            />
+          </div>
+          <div style={styles.paramItem}>
+            <label style={styles.paramLabel}>均线周期</label>
+            <input
+              style={styles.paramInput}
+              type="number"
+              min={3}
+              max={60}
+              value={params.maPeriod}
+              onChange={e => handleParamChange('maPeriod', parseInt(e.target.value) || 5)}
+            />
+          </div>
+          <div style={styles.paramItem}>
+            <label style={styles.paramLabel}>量比阈值</label>
+            <input
+              style={styles.paramInput}
+              type="number"
+              min={1}
+              max={10}
+              step={0.1}
+              value={params.volumeRatioThreshold}
+              onChange={e => handleParamChange('volumeRatioThreshold', parseFloat(e.target.value) || 1.5)}
+            />
+          </div>
+          <div style={styles.paramItem}>
             <label style={styles.paramLabel}>开始日期</label>
             <input
               style={styles.paramInput}
@@ -294,14 +414,47 @@ const BacktestPanel: React.FC = () => {
         </div>
       </div>
 
+      {/* Tab切换 */}
+      {(result || compareResults) && (
+        <div style={styles.tabBar}>
+          {result && (
+            <button
+              style={{ ...styles.tabBtn, ...(activeTab === 'result' ? styles.tabBtnActive : {}) }}
+              onClick={() => setActiveTab('result')}
+            >
+              回测结果
+            </button>
+          )}
+          {compareResults && (
+            <button
+              style={{ ...styles.tabBtn, ...(activeTab === 'compare' ? styles.tabBtnActive : {}) }}
+              onClick={() => setActiveTab('compare')}
+            >
+              策略对比
+            </button>
+          )}
+          {result && (
+            <button style={styles.exportBtn} onClick={exportReport}>
+              导出报告
+            </button>
+          )}
+        </div>
+      )}
+
       {/* 回测结果 */}
-      {result && (
+      {activeTab === 'result' && result && (
         <>
           <div style={styles.resultGrid}>
             <div style={styles.resultCard}>
               <div style={styles.resultLabel}>总收益率</div>
               <div style={{ ...styles.resultValue, color: result.totalReturn >= 0 ? '#00D4AA' : '#FF6B6B' }}>
                 {result.totalReturn >= 0 ? '+' : ''}{result.totalReturn.toFixed(2)}%
+              </div>
+            </div>
+            <div style={styles.resultCard}>
+              <div style={styles.resultLabel}>年化收益率</div>
+              <div style={{ ...styles.resultValue, color: result.annualizedReturn >= 0 ? '#00D4AA' : '#FF6B6B' }}>
+                {result.annualizedReturn >= 0 ? '+' : ''}{result.annualizedReturn.toFixed(2)}%
               </div>
             </div>
             <div style={styles.resultCard}>
@@ -317,6 +470,12 @@ const BacktestPanel: React.FC = () => {
               </div>
             </div>
             <div style={styles.resultCard}>
+              <div style={styles.resultLabel}>盈亏比</div>
+              <div style={{ ...styles.resultValue, color: result.profitLossRatio >= 1 ? '#00D4AA' : '#FFB84D' }}>
+                {result.profitLossRatio.toFixed(2)}
+              </div>
+            </div>
+            <div style={styles.resultCard}>
               <div style={styles.resultLabel}>交易次数</div>
               <div style={styles.resultValue}>{result.tradeCount}</div>
             </div>
@@ -329,6 +488,12 @@ const BacktestPanel: React.FC = () => {
               </div>
             </div>
             <div style={styles.resultCard}>
+              <div style={styles.resultLabel}>夏普比率</div>
+              <div style={{ ...styles.resultValue, color: result.sharpeRatio >= 1 ? '#00D4AA' : '#E8ECF4' }}>
+                {result.sharpeRatio.toFixed(2)}
+              </div>
+            </div>
+            <div style={styles.resultCard}>
               <div style={styles.resultLabel}>最终资金</div>
               <div style={{ ...styles.resultValue, color: '#E8ECF4' }}>
                 ¥{result.finalCapital.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}
@@ -336,9 +501,12 @@ const BacktestPanel: React.FC = () => {
             </div>
           </div>
 
-          {/* 收益曲线 */}
+          {/* 图表 */}
           <div style={styles.chartCard}>
-            <canvas ref={canvasRef} style={styles.canvas} />
+            <canvas ref={equityRef} style={styles.canvas} />
+          </div>
+          <div style={styles.chartCard}>
+            <canvas ref={drawdownRef} style={styles.canvas} />
           </div>
 
           {/* 交易明细 */}
@@ -355,12 +523,13 @@ const BacktestPanel: React.FC = () => {
                     <th style={styles.th}>价格</th>
                     <th style={styles.th}>数量</th>
                     <th style={styles.th}>盈亏</th>
+                    <th style={styles.th}>原因</th>
                   </tr>
                 </thead>
                 <tbody>
                   {result.trades.length === 0 ? (
                     <tr>
-                      <td colSpan={7} style={{ ...styles.td, textAlign: 'center', color: '#5A6B87', padding: '24px' }}>
+                      <td colSpan={8} style={{ ...styles.td, textAlign: 'center', color: '#5A6B87', padding: '24px' }}>
                         暂无交易记录
                       </td>
                     </tr>
@@ -380,12 +549,13 @@ const BacktestPanel: React.FC = () => {
                         <td style={styles.td}>
                           {t.pnl !== undefined ? (
                             <span style={{ color: t.pnl >= 0 ? '#00D4AA' : '#FF6B6B', fontWeight: 600 }}>
-                              {t.pnl >= 0 ? '+' : ''}{t.pnl.toFixed(2)}%
+                              {t.pnl >= 0 ? '+' : ''}{t.pnl.toFixed(2)} ({t.pnlPct?.toFixed(2)}%)
                             </span>
                           ) : (
                             <span style={{ color: '#5A6B87' }}>--</span>
                           )}
                         </td>
+                        <td style={{ ...styles.td, fontSize: '12px', color: '#7A8BA7' }}>{t.reason || '--'}</td>
                       </tr>
                     ))
                   )}
@@ -394,6 +564,47 @@ const BacktestPanel: React.FC = () => {
             </div>
           </div>
         </>
+      )}
+
+      {/* 策略对比 */}
+      {activeTab === 'compare' && compareResults && (
+        <div style={styles.compareSection}>
+          <div style={styles.tradesTitle}>多策略对比</div>
+          <div style={styles.tableContainer}>
+            <table style={styles.table}>
+              <thead>
+                <tr>
+                  <th style={styles.th}>策略名称</th>
+                  <th style={styles.th}>总收益率</th>
+                  <th style={styles.th}>最大回撤</th>
+                  <th style={styles.th}>胜率</th>
+                  <th style={styles.th}>盈亏比</th>
+                  <th style={styles.th}>交易次数</th>
+                  <th style={styles.th}>最终资金</th>
+                  <th style={styles.th}>夏普比率</th>
+                </tr>
+              </thead>
+              <tbody>
+                {compareResults.map((r, idx) => (
+                  <tr key={idx} style={styles.tr}>
+                    <td style={{ ...styles.td, fontWeight: 600 }}>{r.strategy_name}</td>
+                    <td style={{ ...styles.td, color: r.result.totalReturn >= 0 ? '#00D4AA' : '#FF6B6B', fontWeight: 600 }}>
+                      {r.result.totalReturn >= 0 ? '+' : ''}{r.result.totalReturn.toFixed(2)}%
+                    </td>
+                    <td style={{ ...styles.td, color: '#FF6B6B' }}>-{r.result.maxDrawdown.toFixed(2)}%</td>
+                    <td style={{ ...styles.td, color: r.result.winRate >= 50 ? '#00D4AA' : '#FFB84D' }}>
+                      {r.result.winRate.toFixed(2)}%
+                    </td>
+                    <td style={styles.td}>{r.result.profitLossRatio.toFixed(2)}</td>
+                    <td style={styles.td}>{r.result.tradeCount}</td>
+                    <td style={styles.td}>¥{r.result.finalCapital.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</td>
+                    <td style={styles.td}>{r.result.sharpeRatio.toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       )}
     </div>
   )
@@ -431,6 +642,26 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
     cursor: 'pointer',
   },
+  compareBtn: {
+    padding: '6px 16px',
+    border: '1px solid #00D4AA',
+    borderRadius: '6px',
+    background: 'transparent',
+    color: '#00D4AA',
+    fontSize: '13px',
+    fontWeight: 600,
+    cursor: 'pointer',
+  },
+  exportBtn: {
+    padding: '4px 12px',
+    border: '1px solid #5A6B87',
+    borderRadius: '4px',
+    background: 'transparent',
+    color: '#5A6B87',
+    fontSize: '12px',
+    cursor: 'pointer',
+    marginLeft: 'auto',
+  },
   error: {
     padding: '10px 12px',
     background: 'rgba(255,107,107,0.15)',
@@ -453,7 +684,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   paramGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
     gap: '12px',
   },
   paramItem: {
@@ -474,6 +705,27 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '13px',
     outline: 'none',
     fontFamily: 'inherit',
+  },
+  tabBar: {
+    display: 'flex',
+    gap: '8px',
+    alignItems: 'center',
+    borderBottom: '1px solid #243050',
+    paddingBottom: '8px',
+  },
+  tabBtn: {
+    padding: '6px 14px',
+    border: 'none',
+    borderRadius: '4px',
+    background: 'transparent',
+    color: '#7A8BA7',
+    fontSize: '13px',
+    cursor: 'pointer',
+  },
+  tabBtnActive: {
+    background: '#1A2540',
+    color: '#00D4AA',
+    fontWeight: 600,
   },
   resultGrid: {
     display: 'grid',
@@ -505,10 +757,15 @@ const styles: Record<string, React.CSSProperties> = {
   },
   canvas: {
     width: '100%',
-    height: '280px',
+    height: '240px',
     display: 'block',
   },
   tradesSection: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+  },
+  compareSection: {
     display: 'flex',
     flexDirection: 'column',
     gap: '8px',

@@ -10,6 +10,7 @@ import WatchlistPanel from '../components/WatchlistPanel'
 import TradeLog from '../components/TradeLog'
 import DailyReport from '../components/DailyReport'
 import BacktestPanel from '../components/BacktestPanel'
+import HistoryReplay from '../components/HistoryReplay'
 import AccountManager from '../components/AccountManager'
 import ConceptPanel from '../components/ConceptPanel'
 import DragonTiger from '../components/DragonTiger'
@@ -30,6 +31,8 @@ type NavKey =
   | 'kline'
   | 'tradelog'
   | 'risk'
+  | 'backtest'
+  | 'replay'
   | 'settings'
 
 interface NavItem {
@@ -48,6 +51,8 @@ const NAV_ITEMS: NavItem[] = [
   { key: 'kline', icon: '\u{1F4CA}', label: 'K线/分时' },
   { key: 'tradelog', icon: '\u{1F4DD}', label: '交易日志' },
   { key: 'risk', icon: '\u{1F6E1}\uFE0F', label: '风控中心' },
+  { key: 'backtest', icon: '\u{1F4C9}', label: '策略回测' },
+  { key: 'replay', icon: '\u23F8', label: '历史回放' },
   { key: 'settings', icon: '\u2699\uFE0F', label: '系统设置' },
 ]
 
@@ -522,6 +527,10 @@ const Dashboard: React.FC = () => {
         return <div className={styles.panelContainer}><TradeLog /></div>
       case 'risk':
         return <div className={styles.panelContainer}><RiskPanel data={data?.risk} /></div>
+      case 'backtest':
+        return <div className={styles.panelContainer}><BacktestPanel /></div>
+      case 'replay':
+        return <div className={styles.panelContainer}><HistoryReplay /></div>
       case 'settings':
         return (
           <div className={styles.panelContainer}>

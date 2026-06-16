@@ -56,40 +56,42 @@ export function useMarketData() {
     prevSignalsRef.current = currentIds
   }, [playAlert])
 
-  // HTTP轮询获取数据
+  // HTTP轮询获取数据 - 优化：避免重复请求，减少闪烁
+  const isFetchingRef = useRef(false)
   const fetchData = useCallback(async () => {
+    if (isFetchingRef.current) return
+    isFetchingRef.current = true
     try {
       setIsLoading(true)
-      const [indicesRes, riskRes, positionsRes, signalsRes, auctionRes] = await Promise.all([
+      const [indicesRes, riskRes, positionsRes, signalsRes] = await Promise.all([
         fetch(`/api/market/indices`).then(r => r.json()).catch(() => null),
         fetch(`/api/risk/status`).then(r => r.json()).catch(() => null),
         fetch(`/api/positions`).then(r => r.json()).catch(() => null),
         fetch(`/api/signals`).then(r => r.json()).catch(() => null),
-        fetch(`/api/auction/analyze`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: '[]'
-        }).then(r => r.json()).catch(() => null),
       ])
 
       const newSignals = signalsRes?.signals || []
       checkNewSignals(newSignals)
 
-      setData(prev => ({
-        ...prev,
-        indices: indicesRes?.indices || prev?.indices,
-        risk: riskRes?.status || prev?.risk,
-        positions: positionsRes || prev?.positions,
-        signals: newSignals,
-        auction: auctionRes || prev?.auction,
-        timestamp: new Date().toISOString(),
-      }))
+      setData(prev => {
+        // 只在数据真正变化时更新，避免不必要的重渲染
+        const next = {
+          ...prev,
+          indices: indicesRes?.indices || prev?.indices,
+          risk: riskRes?.status || prev?.risk,
+          positions: positionsRes || prev?.positions,
+          signals: newSignals,
+          timestamp: new Date().toISOString(),
+        }
+        return next
+      })
       setIsConnected(true)
     } catch (e) {
       console.error('Fetch error:', e)
       setIsConnected(false)
     } finally {
       setIsLoading(false)
+      isFetchingRef.current = false
     }
   }, [checkNewSignals])
 

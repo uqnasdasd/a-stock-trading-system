@@ -23,6 +23,8 @@ from app.services.dragon_tiger.dragon import dragon_tiger_service
 from app.services.open_confirm.confirm import open_confirm
 from app.services.morning_breakout.breakout import morning_breakout
 from app.services.afternoon_stable.stable import afternoon_stable
+from app.services.backtest.engine import backtest_engine, BacktestParams
+from app.services.history.replay import history_replay_engine, ReplayParams
 
 router = APIRouter()
 
@@ -610,3 +612,147 @@ async def background_monitor_task():
         except Exception as e:
             logger.error(f"后台监控任务错误: {e}")
             await asyncio.sleep(5)
+
+
+# ==================== 回测API ====================
+
+@router.post("/backtest/run")
+async def api_backtest_run(params: dict = Body(...)):
+    """运行策略回测"""
+    try:
+        bp = BacktestParams(
+            code=params.get("code", "sh000001"),
+            buy_condition=params.get("buy_condition", "ma_break"),
+            sell_condition=params.get("sell_condition", "stop_profit_loss"),
+            hold_period=params.get("hold_period", 5),
+            start_date=params.get("start_date", "2024-01-01"),
+            end_date=params.get("end_date", "2024-06-01"),
+            initial_capital=params.get("initial_capital", 100000.0),
+            stop_loss_pct=params.get("stop_loss_pct", 0.03),
+            take_profit_pct=params.get("take_profit_pct", 0.05),
+            ma_period=params.get("ma_period", 5),
+            volume_ratio_threshold=params.get("volume_ratio_threshold", 1.5),
+        )
+        result = await backtest_engine.run(bp)
+        return {
+            "result": {
+                "totalReturn": result.total_return,
+                "maxDrawdown": result.max_drawdown,
+                "winRate": result.win_rate,
+                "profitLossRatio": result.profit_loss_ratio,
+                "tradeCount": result.trade_count,
+                "profitTrades": result.profit_trades,
+                "lossTrades": result.loss_trades,
+                "finalCapital": result.final_capital,
+                "annualizedReturn": result.annualized_return,
+                "sharpeRatio": result.sharpe_ratio,
+                "equityCurve": result.equity_curve,
+                "drawdownCurve": result.drawdown_curve,
+                "trades": [
+                    {
+                        "date": t.date,
+                        "code": t.code,
+                        "name": t.name,
+                        "action": t.action,
+                        "price": t.price,
+                        "volume": t.volume,
+                        "pnl": t.pnl,
+                        "pnlPct": t.pnl_pct,
+                        "reason": t.reason,
+                    }
+                    for t in result.trades
+                ],
+            }
+        }
+    except Exception as e:
+        logger.error(f"回测运行失败: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/backtest/compare")
+async def api_backtest_compare(params: dict = Body(...)):
+    """多策略对比回测"""
+    try:
+        results = await backtest_engine.run_multi_strategy(
+            code=params.get("code", "sh000001"),
+            start_date=params.get("start_date", "2024-01-01"),
+            end_date=params.get("end_date", "2024-06-01"),
+            strategies=params.get("strategies", []),
+        )
+        return {"results": results}
+    except Exception as e:
+        logger.error(f"多策略对比失败: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ==================== 历史回放API ====================
+
+@router.post("/history/replay/load")
+async def api_history_replay_load(params: dict = Body(...)):
+    """加载历史回放数据"""
+    try:
+        rp = ReplayParams(
+            code=params.get("code", "sh000001"),
+            date=params.get("date", "2024-01-15"),
+            speed=params.get("speed", 1.0),
+        )
+        result = await history_replay_engine.load_day_data(rp)
+        if result.get("success"):
+            report = history_replay_engine.generate_report()
+            return {
+                "success": True,
+                "code": result["code"],
+                "name": result["name"],
+                "date": result["date"],
+                "total_ticks": result["total_ticks"],
+                "ticks": history_replay_engine.get_all_ticks(),
+                "report": {
+                    "code": report.code,
+                    "name": report.name,
+                    "date": report.date,
+                    "total_ticks": report.total_ticks,
+                    "open_price": report.open_price,
+                    "close_price": report.close_price,
+                    "high_price": report.high_price,
+                    "low_price": report.low_price,
+                    "total_volume": report.total_volume,
+                    "total_amount": report.total_amount,
+                    "change_pct": report.change_pct,
+                    "amplitude": report.amplitude,
+                    "key_signals": report.key_signals,
+                    "phase_summary": report.phase_summary,
+                },
+            }
+        else:
+            return result
+    except Exception as e:
+        logger.error(f"历史回放加载失败: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/history/replay/report")
+async def api_history_replay_report(params: dict = Body(...)):
+    """生成历史复盘报告"""
+    try:
+        report = history_replay_engine.generate_report()
+        return {
+            "report": {
+                "code": report.code,
+                "name": report.name,
+                "date": report.date,
+                "total_ticks": report.total_ticks,
+                "open_price": report.open_price,
+                "close_price": report.close_price,
+                "high_price": report.high_price,
+                "low_price": report.low_price,
+                "total_volume": report.total_volume,
+                "total_amount": report.total_amount,
+                "change_pct": report.change_pct,
+                "amplitude": report.amplitude,
+                "key_signals": report.key_signals,
+                "phase_summary": report.phase_summary,
+            }
+        }
+    except Exception as e:
+        logger.error(f"生成复盘报告失败: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
