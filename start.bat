@@ -3,81 +3,99 @@ chcp 65001 >nul 2>&1
 title A股超短交易系统
 color 0A
 
-echo ╔══════════════════════════════════════════════╗
-echo ║       A股超短交易实时监测系统 v2.3           ║
-echo ║           正在启动...                        ║
-echo ╚══════════════════════════════════════════════╝
+echo.
+echo   A股超短交易实时监测系统 v2.4
+echo   正在启动...
 echo.
 
 cd /d "%~dp0"
 
-:: 检查Python
+:: ===== 检查Python =====
 python --version >nul 2>&1
 if errorlevel 1 (
-    echo ❌ 未找到Python！请先运行 install.bat 安装依赖
+    echo [错误] 未找到Python！
+    echo 请先安装Python: https://www.python.org/downloads/
+    echo 安装时务必勾选 "Add Python to PATH"
     echo.
-    echo 按任意键退出...
-    pause >nul
+    pause
     exit
 )
 
-:: 检查Node.js
-node --version >nul 2>&1
+:: ===== 检查后端依赖 =====
+echo [1/3] 检查后端依赖...
+python -c "import fastapi" >nul 2>&1
 if errorlevel 1 (
-    echo ❌ 未找到Node.js！请先运行 install.bat 安装依赖
-    echo.
-    echo 按任意键退出...
-    pause >nul
-    exit
-)
-
-:: 检查前端是否已构建
-if not exist frontend\dist\index.html (
-    echo ⚠️ 前端未构建，正在构建...
-    cd frontend
-    call npx vite build 2>&1
+    echo 后端依赖未安装，正在安装...
+    cd backend
+    pip install -r requirements.txt
+    if errorlevel 1 (
+        echo [错误] 后端依赖安装失败！
+        echo 请截图此窗口发给我
+        pause
+        exit
+    )
     cd ..
-    echo ✅ 前端构建完成
-    echo.
+    echo 后端依赖安装完成
 )
 
-:: 启动后端
-echo [1/2] 启动后端服务...
-cd backend
-start "A股超短交易-后端" /min cmd /c "python main.py"
-cd ..
-echo 等待后端启动...
-timeout /t 5 /nobreak >nul
+:: ===== 检查前端依赖 =====
+echo [2/3] 检查前端依赖...
+if not exist frontend\node_modules\vite (
+    echo 前端依赖未安装，正在安装（可能需要几分钟）...
+    cd frontend
+    call npm install
+    if errorlevel 1 (
+        echo [错误] 前端依赖安装失败！
+        echo 请确认已安装Node.js: https://nodejs.org/
+        pause
+        exit
+    )
+    cd ..
+    echo 前端依赖安装完成
+)
 
-:: 检查后端是否启动成功
+:: ===== 启动后端 =====
+echo [3/3] 启动服务...
+echo.
+echo 正在启动后端（新窗口）...
+cd backend
+start "A股后端" cmd /k "python main.py 2>&1"
+cd ..
+echo 等待后端启动（8秒）...
+timeout /t 8 /nobreak >nul
+
+:: 检查后端
 curl -s http://localhost:8000/health >nul 2>&1
 if errorlevel 1 (
-    echo ⚠️ 后端可能启动失败，但继续尝试启动前端...
+    echo.
+    echo [警告] 后端可能启动失败
+    echo 请查看 "A股后端" 窗口中的错误信息
+    echo 如果提示缺少模块，请在该窗口中运行: pip install 模块名
+    echo.
 ) else (
-    echo ✅ 后端启动成功
+    echo 后端启动成功！
 )
-echo.
 
-:: 启动前端
-echo [2/2] 启动前端界面...
+:: ===== 启动前端 =====
+echo 正在启动前端...
 cd frontend
-start "A股超短交易-前端" cmd /c "npx vite --port 3000 --open"
+start "A股前端" cmd /k "npx vite --port 3000"
 cd ..
-timeout /t 3 /nobreak >nul
+timeout /t 5 /nobreak >nul
+
+:: ===== 打开浏览器 =====
+echo 正在打开浏览器...
+start http://localhost:3000
 
 echo.
-echo ╔══════════════════════════════════════════════╗
-echo ║  系统已启动！浏览器将自动打开               ║
-echo ║  如未打开，请访问: http://localhost:3000     ║
-echo ║                                              ║
-echo ║  关闭此窗口将停止所有服务                    ║
-echo ╚══════════════════════════════════════════════╝
+echo ========================================
+echo   系统已启动！
+echo   浏览器地址: http://localhost:3000
+echo
+echo   关闭方式:
+echo   - 关闭 "A股后端" 窗口
+echo   - 关闭 "A股前端" 窗口
+echo   - 或直接关闭本窗口
+echo ========================================
 echo.
-echo 按任意键关闭系统...
-pause >nul
-
-:: 关闭所有服务
-taskkill /f /fi "WINDOWTITLE eq A股超短交易-后端" >nul 2>&1
-taskkill /f /fi "WINDOWTITLE eq A股超短交易-前端" >nul 2>&1
-echo 系统已关闭
-timeout /t 2 /nobreak >nul
+pause
