@@ -1,0 +1,57 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - DATABASE_URL=sqlite:///./data/trading_system.db
+      - DINGTALK_WEBHOOK=${DINGTALK_WEBHOOK:-}
+      - WECHAT_WEBHOOK=${WECHAT_WEBHOOK:-}
+      - DATA_SOURCE_PRIMARY=sina
+      - DATA_SOURCE_BACKUP=tencent
+      - POLL_INTERVAL=3
+    volumes:
+      - ./backend/logs:/app/logs
+      - ./backend/data:/app/data
+    depends_on:
+      - redis
+    restart: unless-stopped
+    networks:
+      - trading-net
+
+  frontend:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./frontend/dist:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - trading-net
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - trading-net
+
+volumes:
+  redis_data:
+
+networks:
+  trading-net:
+    driver: bridge

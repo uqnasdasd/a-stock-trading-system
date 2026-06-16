@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_HOST=redis
+      - DINGTALK_WEBHOOK=${DINGTALK_WEBHOOK}
+      - WECHAT_WEBHOOK=${WECHAT_WEBHOOK}
+    volumes:
+      - ./backend/logs:/app/logs
+      - ./backend/data:/app/data
+    depends_on:
+      - redis
+    restart: unless-stopped
+    networks:
+      - trading-net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - trading-net
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - trading-net
+
+volumes:
+  redis_data:
+
+networks:
+  trading-net:
+    driver: bridge
