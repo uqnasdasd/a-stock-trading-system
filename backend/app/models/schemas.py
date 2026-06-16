@@ -125,6 +125,9 @@ class RiskStatus(BaseModel):
     weekly_trade_count: int        # 本周交易次数
     is_locked: bool = False        # 是否被锁定
     lock_reason: Optional[str] = None
+    total_capital: float = 0.0     # 总资金
+    used_capital: float = 0.0      # 已用资金
+    available_capital: float = 0.0 # 可用资金
 
 
 class TradingSignal(BaseModel):

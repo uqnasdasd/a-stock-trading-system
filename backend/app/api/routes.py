@@ -112,7 +112,7 @@ async def remove_position(code: str):
 async def get_risk_status():
     """获取风控状态"""
     status = risk_controller.get_status()
-    can_trade, reason = risk_controller.can_trade()
+    can_trade, reason = await risk_controller.can_trade()
     return {
         "status": status.model_dump(),
         "can_trade": can_trade,

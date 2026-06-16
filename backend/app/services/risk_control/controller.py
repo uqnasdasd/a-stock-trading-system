@@ -418,6 +418,7 @@ class RiskController:
         total_pct = total_value / self.total_capital if self.total_capital > 0 else 0
         daily_pnl_pct = self.daily_pnl / self.total_capital if self.total_capital > 0 else 0
         weekly_pnl_pct = self.weekly_pnl / self.total_capital if self.total_capital > 0 else 0
+        available = self.total_capital - total_value
 
         return RiskStatus(
             total_position_pct=round(total_pct, 4),
@@ -427,6 +428,9 @@ class RiskController:
             weekly_trade_count=len(self.weekly_trades),
             is_locked=self.is_locked,
             lock_reason=self.lock_reason,
+            total_capital=round(self.total_capital, 2),
+            used_capital=round(total_value, 2),
+            available_capital=round(max(available, 0), 2),
         )
 
     def get_available_capital(self) -> float:
