@@ -1,4 +1,4 @@
-name: Deploy to Vercel and Render
+name: Deploy to Vercel and Railway
 
 on:
   push:
@@ -25,8 +25,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Deploy to Render
-        uses: johnbeynon/render-deploy-action@v0.0.8
+      - name: Deploy to Railway
+        uses: railway/cli@master
         with:
-          service-id: ${{ secrets.RENDER_SERVICE_ID }}
-          api-key: ${{ secrets.RENDER_API_KEY }}
+          railway_token: ${{ secrets.RAILWAY_TOKEN }}
+          service: a-stock-trading-backend
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
