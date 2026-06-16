@@ -3,7 +3,6 @@ __pycache__/
 *.pyo
 node_modules/
 .vite/
-dist/
 *.db
 logs/
 *.log

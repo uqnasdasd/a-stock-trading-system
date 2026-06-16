@@ -1,8 +1,11 @@
 """A股超短交易实时监测系统 - 后端入口"""
 import asyncio
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from loguru import logger
 import sys
 
@@ -13,6 +16,9 @@ from app.core.database import init_db
 logger.remove()
 logger.add(sys.stderr, level="INFO")
 logger.add("logs/trading_system.log", rotation="10 MB", retention="7 days", level="DEBUG")
+
+# 前端静态文件目录
+FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend", "dist")
 
 
 @asynccontextmanager
@@ -38,7 +44,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="A股超短交易实时监测系统",
     description="融合竞价选股/持仓判断/突破主升/超短交易的综合实时监测平台",
-    version="1.0.0",
+    version="2.4",
     lifespan=lifespan,
 )
 
@@ -51,24 +57,30 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 注册路由
+# 注册API路由
 app.include_router(router)
 
-
-@app.get("/")
-async def root():
-    """根路径"""
-    return {
-        "name": "A股超短交易实时监测系统",
-        "version": "1.0.0",
-        "status": "running",
-    }
-
-
+# 健康检查（必须在SPA fallback之前）
 @app.get("/health")
 async def health_check():
     """健康检查"""
     return {"status": "healthy"}
+
+# 托管前端静态文件（如果存在）
+if os.path.isdir(FRONTEND_DIR):
+    app.mount("/assets", StaticFiles(directory=os.path.join(FRONTEND_DIR, "assets")), name="assets")
+
+    @app.get("/")
+    async def serve_index():
+        return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
+
+    @app.get("/{path:path}")
+    async def serve_spa(path: str):
+        """SPA fallback: 所有未匹配路径返回index.html"""
+        file_path = os.path.join(FRONTEND_DIR, path)
+        if os.path.isfile(file_path):
+            return FileResponse(file_path)
+        return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
 
 
 if __name__ == "__main__":
