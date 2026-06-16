@@ -33,6 +33,8 @@ type NavKey =
   | 'risk'
   | 'backtest'
   | 'replay'
+  | 'concept'
+  | 'dragon'
   | 'settings'
 
 interface NavItem {
@@ -53,6 +55,8 @@ const NAV_ITEMS: NavItem[] = [
   { key: 'risk', icon: '\u{1F6E1}\uFE0F', label: '风控中心' },
   { key: 'backtest', icon: '\u{1F4C9}', label: '策略回测' },
   { key: 'replay', icon: '\u23F8', label: '历史回放' },
+  { key: 'concept', icon: '\u{1F525}', label: '概念板块' },
+  { key: 'dragon', icon: '\u{1F409}', label: '龙虎榜' },
   { key: 'settings', icon: '\u2699\uFE0F', label: '系统设置' },
 ]
 
@@ -533,6 +537,10 @@ const Dashboard: React.FC = () => {
         return <div className={styles.panelContainer}><BacktestPanel /></div>
       case 'replay':
         return <div className={styles.panelContainer}><HistoryReplay /></div>
+      case 'concept':
+        return <div className={styles.panelContainer}><ConceptPanel /></div>
+      case 'dragon':
+        return <div className={styles.panelContainer}><DragonTiger /></div>
       case 'settings':
         return (
           <div className={styles.panelContainer}>
@@ -558,22 +566,6 @@ const Dashboard: React.FC = () => {
               </div>
               <div className={styles.cardBody}>
                 <BacktestPanel />
-              </div>
-            </div>
-            <div className={styles.card} style={{ marginTop: 16 }}>
-              <div className={styles.cardHeader}>
-                <h3 className={styles.cardTitle}>概念板块</h3>
-              </div>
-              <div className={styles.cardBody}>
-                <ConceptPanel />
-              </div>
-            </div>
-            <div className={styles.card} style={{ marginTop: 16 }}>
-              <div className={styles.cardHeader}>
-                <h3 className={styles.cardTitle}>龙虎榜</h3>
-              </div>
-              <div className={styles.cardBody}>
-                <DragonTiger />
               </div>
             </div>
             <div className={styles.card} style={{ marginTop: 16 }}>

@@ -143,6 +143,20 @@ async def init_db():
             )
         """)
 
+        # accounts 账户表
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS accounts (
+                id TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                total_capital REAL NOT NULL DEFAULT 0,
+                used_capital REAL NOT NULL DEFAULT 0,
+                available_capital REAL NOT NULL DEFAULT 0,
+                positions_json TEXT NOT NULL DEFAULT '[]',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                is_active INTEGER NOT NULL DEFAULT 1
+            )
+        """)
+
         await db.commit()
         logger.info("数据库初始化完成，所有表已创建")
     finally:
@@ -718,5 +732,67 @@ async def db_get_risk_control_by_week(week_start: str) -> List[dict]:
             data["is_locked"] = bool(data["is_locked"])
             result.append(data)
         return result
+    finally:
+        pass
+
+
+# ==================== Accounts CRUD ====================
+
+async def db_get_accounts() -> List[dict]:
+    """获取所有账户"""
+    db = await get_db()
+    try:
+        cursor = await db.execute("SELECT * FROM accounts WHERE is_active = 1 ORDER BY created_at DESC")
+        rows = await cursor.fetchall()
+        result = []
+        for row in rows:
+            data = dict(row)
+            data["positions"] = json.loads(data["positions_json"])
+            del data["positions_json"]
+            data["is_active"] = bool(data["is_active"])
+            result.append(data)
+        return result
+    finally:
+        pass
+
+
+async def db_save_account(account: dict) -> dict:
+    """保存或更新账户"""
+    db = await get_db()
+    try:
+        positions_json = json.dumps(account.get("positions", []), ensure_ascii=False, default=str)
+        await db.execute(
+            """
+            INSERT OR REPLACE INTO accounts
+            (id, name, total_capital, used_capital, available_capital, positions_json, created_at, is_active)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                account["id"],
+                account["name"],
+                account.get("total_capital", 0),
+                account.get("used_capital", 0),
+                account.get("available_capital", 0),
+                positions_json,
+                account.get("created_at", datetime.now().isoformat()),
+                1 if account.get("is_active", True) else 0,
+            ),
+        )
+        await db.commit()
+        return {"status": "success", "id": account["id"]}
+    finally:
+        pass
+
+
+async def db_delete_account(account_id: str) -> dict:
+    """删除账户（软删除）"""
+    db = await get_db()
+    try:
+        await db.execute(
+            "UPDATE accounts SET is_active = 0 WHERE id = ?",
+            (account_id,),
+        )
+        await db.commit()
+        return {"status": "success", "id": account_id}
     finally:
         pass

@@ -25,6 +25,7 @@ from app.services.morning_breakout.breakout import morning_breakout
 from app.services.afternoon_stable.stable import afternoon_stable
 from app.services.backtest.engine import backtest_engine, BacktestParams
 from app.services.history.replay import history_replay_engine, ReplayParams
+from app.core.database import db_get_accounts, db_save_account, db_delete_account
 
 router = APIRouter()
 
@@ -459,6 +460,33 @@ async def get_today_dragon_tiger():
         "dragons": dragons,
         "summary": summary,
     }
+
+
+# ============ 账户管理路由 ============
+
+@router.get("/api/accounts")
+async def get_accounts():
+    """获取所有账户"""
+    accounts = await db_get_accounts()
+    return {
+        "accounts": accounts,
+    }
+
+
+@router.post("/api/accounts")
+async def save_accounts(request: Request):
+    """保存账户列表（批量覆盖）"""
+    body = await request.json()
+    accounts = body.get("accounts", [])
+    for account in accounts:
+        await db_save_account(account)
+    return {"status": "success", "count": len(accounts)}
+
+
+@router.delete("/api/accounts/{account_id}")
+async def delete_account(account_id: str):
+    """删除账户"""
+    return await db_delete_account(account_id)
 
 
 # ============ WebSocket ============
