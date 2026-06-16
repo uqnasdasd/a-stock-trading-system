@@ -28680,3 +28680,713 @@
 2026-06-16 11:50:07.452 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
 2026-06-16 11:50:07.452 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
 2026-06-16 11:50:10.329 | INFO     | main:lifespan:35 - 系统关闭
+2026-06-16 11:53:21.233 | INFO     | main:lifespan:21 - ==================================================
+2026-06-16 11:53:21.234 | INFO     | main:lifespan:22 - A股超短交易实时监测系统启动
+2026-06-16 11:53:21.234 | INFO     | main:lifespan:23 - ==================================================
+2026-06-16 11:53:21.235 | INFO     | app.core.database:get_db:25 - 数据库连接池初始化完成
+2026-06-16 11:53:21.237 | INFO     | app.core.database:init_db:147 - 数据库初始化完成，所有表已创建
+2026-06-16 11:53:21.518 | INFO     | app.services.position_monitor.monitor:load_from_db:57 - 从数据库加载 0 条持仓
+2026-06-16 11:53:21.518 | INFO     | app.services.position_monitor.monitor:load_from_db:57 - 从数据库加载 0 条持仓
+2026-06-16 11:53:21.519 | INFO     | app.services.watchlist.manager:load_from_db:36 - 从数据库加载 0 条自选股
+2026-06-16 11:53:21.519 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:53:21.520 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:53:21.520 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:53:21.556 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:53:21.556 | INFO     | app.services.auction_engine.engine:run_auction_analysis:125 - 开始竞价分析...
+2026-06-16 11:53:21.694 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:53:21.746 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:22.434 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:23.374 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:53:23.374 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:53:23.374 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:53:23.679 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:53:23.712 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:23.712 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:23.713 | INFO     | app.services.auction_engine.engine:_get_sector_map:99 - 使用默认板块映射
+2026-06-16 11:53:23.884 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 117/117 只股票
+2026-06-16 11:53:24.093 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:24.780 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:25.968 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:25.968 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:26.153 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:26.510 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:53:26.510 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:53:26.510 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:53:26.541 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:53:26.839 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:28.054 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:28.055 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:28.057 | WARNING  | app.services.limit_monitor.monitor:fetch_limit_data:136 - 无法获取A股列表，回退到热门股票扫描
+2026-06-16 11:53:28.259 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 20/20 只股票
+2026-06-16 11:53:28.261 | INFO     | app.services.limit_monitor.tracker:load_from_db:44 - 从数据库加载 0 条连板追踪数据
+2026-06-16 11:53:28.262 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:53:28.262 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:53:28.263 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:53:29.536 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:53:29.537 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:53:29.537 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:53:29.570 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:53:31.434 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:53:31.435 | INFO     | app.services.auction_engine.engine:run_auction_analysis:125 - 开始竞价分析...
+2026-06-16 11:53:31.609 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 117/117 只股票
+2026-06-16 11:53:31.821 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:32.599 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:53:32.599 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:53:32.599 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:53:32.632 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:53:32.650 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:33.843 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:33.843 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:34.031 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:34.721 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:35.512 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:53:35.514 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:53:35.514 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:53:35.546 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:53:35.907 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:35.907 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:35.908 | WARNING  | app.services.limit_monitor.monitor:fetch_limit_data:136 - 无法获取A股列表，回退到热门股票扫描
+2026-06-16 11:53:36.077 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 20/20 只股票
+2026-06-16 11:53:36.077 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:53:36.077 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:53:36.077 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:53:38.373 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:53:38.374 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:53:38.374 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:53:38.542 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:53:39.253 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:53:39.254 | INFO     | app.services.auction_engine.engine:run_auction_analysis:125 - 开始竞价分析...
+2026-06-16 11:53:39.428 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 117/117 只股票
+2026-06-16 11:53:39.624 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:40.310 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:41.597 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:53:41.597 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:53:41.598 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:53:41.633 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:53:41.655 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:41.655 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:41.847 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:42.540 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:43.735 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:43.735 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:43.737 | WARNING  | app.services.limit_monitor.monitor:fetch_limit_data:136 - 无法获取A股列表，回退到热门股票扫描
+2026-06-16 11:53:43.907 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 20/20 只股票
+2026-06-16 11:53:43.907 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:53:43.907 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:53:43.908 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:53:44.514 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:53:44.514 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:53:44.514 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:53:44.552 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:53:47.109 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:53:47.109 | INFO     | app.services.auction_engine.engine:run_auction_analysis:125 - 开始竞价分析...
+2026-06-16 11:53:47.280 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 117/117 只股票
+2026-06-16 11:53:47.433 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:53:47.434 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:53:47.434 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:53:47.607 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:53:47.625 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:48.444 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:49.692 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:49.692 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:49.993 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:50.426 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:53:50.431 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:53:50.433 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:53:50.823 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:53:50.842 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:52.037 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:52.038 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:52.039 | WARNING  | app.services.limit_monitor.monitor:fetch_limit_data:136 - 无法获取A股列表，回退到热门股票扫描
+2026-06-16 11:53:52.208 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 20/20 只股票
+2026-06-16 11:53:52.208 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:53:52.209 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:53:52.209 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:53:53.509 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:53:53.509 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:53:53.509 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:53:53.543 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:53:55.380 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:53:55.380 | INFO     | app.services.auction_engine.engine:run_auction_analysis:125 - 开始竞价分析...
+2026-06-16 11:53:55.562 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 117/117 只股票
+2026-06-16 11:53:55.759 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:56.398 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:53:56.399 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:53:56.399 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:53:56.565 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:53:56.587 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:57.775 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:57.775 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:57.966 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:58.671 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:59.509 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:53:59.510 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:53:59.510 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:53:59.542 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:53:59.930 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:59.930 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:53:59.932 | WARNING  | app.services.limit_monitor.monitor:fetch_limit_data:136 - 无法获取A股列表，回退到热门股票扫描
+2026-06-16 11:54:00.102 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 20/20 只股票
+2026-06-16 11:54:00.103 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:54:00.103 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:54:00.103 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:54:02.374 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:54:02.374 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:54:02.375 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:54:02.553 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:54:03.283 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:54:03.283 | INFO     | app.services.auction_engine.engine:run_auction_analysis:125 - 开始竞价分析...
+2026-06-16 11:54:03.456 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 117/117 只股票
+2026-06-16 11:54:03.667 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:04.365 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:05.648 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:54:05.649 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:54:05.649 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:54:05.682 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:54:05.705 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:05.705 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:05.901 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:06.600 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:07.791 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:07.791 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:07.793 | WARNING  | app.services.limit_monitor.monitor:fetch_limit_data:136 - 无法获取A股列表，回退到热门股票扫描
+2026-06-16 11:54:07.965 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 20/20 只股票
+2026-06-16 11:54:07.966 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:54:07.966 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:54:07.966 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:54:08.516 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:54:08.517 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:54:08.517 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:54:08.552 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:54:11.137 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:54:11.138 | INFO     | app.services.auction_engine.engine:run_auction_analysis:125 - 开始竞价分析...
+2026-06-16 11:54:11.312 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 117/117 只股票
+2026-06-16 11:54:11.601 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:54:11.602 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:54:11.602 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:54:11.637 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:54:11.658 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:12.348 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:13.544 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:13.545 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:13.739 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:14.517 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:54:14.519 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:54:14.519 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:54:14.560 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:54:14.571 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:15.757 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:15.758 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:15.759 | WARNING  | app.services.limit_monitor.monitor:fetch_limit_data:136 - 无法获取A股列表，回退到热门股票扫描
+2026-06-16 11:54:15.928 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 20/20 只股票
+2026-06-16 11:54:15.928 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:54:15.929 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:54:15.929 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:54:17.510 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:54:17.511 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:54:17.511 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:54:17.550 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:54:19.109 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:54:19.109 | INFO     | app.services.auction_engine.engine:run_auction_analysis:125 - 开始竞价分析...
+2026-06-16 11:54:19.290 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 117/117 只股票
+2026-06-16 11:54:19.487 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:20.173 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:20.372 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:54:20.373 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:54:20.373 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:54:20.552 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:54:21.360 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:21.361 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:21.549 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:22.241 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:23.523 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:54:23.524 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:54:23.524 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:54:23.556 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:54:23.614 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:23.621 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:23.672 | WARNING  | app.services.limit_monitor.monitor:fetch_limit_data:136 - 无法获取A股列表，回退到热门股票扫描
+2026-06-16 11:54:23.878 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 20/20 只股票
+2026-06-16 11:54:23.878 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:54:23.878 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:54:23.878 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:54:26.512 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:54:26.513 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:54:26.513 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:54:26.547 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:54:27.054 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:54:27.055 | INFO     | app.services.auction_engine.engine:run_auction_analysis:125 - 开始竞价分析...
+2026-06-16 11:54:27.230 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 117/117 只股票
+2026-06-16 11:54:27.440 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:28.135 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:29.329 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:29.330 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:29.612 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:54:29.613 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:54:29.613 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:54:29.648 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:54:29.678 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:30.448 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:31.671 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:31.671 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:31.673 | WARNING  | app.services.limit_monitor.monitor:fetch_limit_data:136 - 无法获取A股列表，回退到热门股票扫描
+2026-06-16 11:54:31.840 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 20/20 只股票
+2026-06-16 11:54:31.841 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:54:31.841 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:54:31.841 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:54:32.510 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:54:32.511 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:54:32.511 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:54:32.544 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:54:35.047 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:54:35.049 | INFO     | app.services.auction_engine.engine:run_auction_analysis:125 - 开始竞价分析...
+2026-06-16 11:54:35.263 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 117/117 只股票
+2026-06-16 11:54:35.548 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:54:35.549 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:54:35.549 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:54:35.585 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:54:35.630 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:36.325 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:37.587 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:37.587 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:37.802 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:38.583 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:54:38.585 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:54:38.585 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:54:38.621 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:54:38.651 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:39.890 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:39.890 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:39.892 | WARNING  | app.services.limit_monitor.monitor:fetch_limit_data:136 - 无法获取A股列表，回退到热门股票扫描
+2026-06-16 11:54:40.072 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 20/20 只股票
+2026-06-16 11:54:40.072 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:54:40.073 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:54:40.073 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:54:41.372 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:54:41.373 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:54:41.373 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:54:41.557 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:54:43.246 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:54:43.247 | INFO     | app.services.auction_engine.engine:run_auction_analysis:125 - 开始竞价分析...
+2026-06-16 11:54:43.430 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 117/117 只股票
+2026-06-16 11:54:43.636 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:44.339 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:44.509 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:54:44.509 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:54:44.509 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:54:44.543 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:54:45.535 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:45.536 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:45.730 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:46.425 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:47.371 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:54:47.371 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:54:47.371 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:54:47.685 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:54:47.700 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:47.700 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:47.701 | WARNING  | app.services.limit_monitor.monitor:fetch_limit_data:136 - 无法获取A股列表，回退到热门股票扫描
+2026-06-16 11:54:47.869 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 20/20 只股票
+2026-06-16 11:54:47.870 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:54:47.870 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:54:47.870 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:54:50.371 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:54:50.371 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:54:50.372 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:54:50.542 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:54:51.039 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:54:51.040 | INFO     | app.services.auction_engine.engine:run_auction_analysis:125 - 开始竞价分析...
+2026-06-16 11:54:51.216 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 117/117 只股票
+2026-06-16 11:54:51.411 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:52.101 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:53.289 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:53.289 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:53.570 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:54:53.570 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:54:53.570 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:54:53.608 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:54:53.690 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:54.383 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:55.631 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:55.632 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:55.633 | WARNING  | app.services.limit_monitor.monitor:fetch_limit_data:136 - 无法获取A股列表，回退到热门股票扫描
+2026-06-16 11:54:55.803 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 20/20 只股票
+2026-06-16 11:54:55.803 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:54:55.804 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:54:55.804 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:54:56.371 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:54:56.372 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:54:56.372 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:54:56.543 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:54:58.980 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:54:58.980 | INFO     | app.services.auction_engine.engine:run_auction_analysis:125 - 开始竞价分析...
+2026-06-16 11:54:59.163 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 117/117 只股票
+2026-06-16 11:54:59.506 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:54:59.507 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:54:59.507 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:54:59.509 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:54:59.542 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:55:00.273 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:01.623 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:01.624 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:01.897 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:02.376 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:55:02.377 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:55:02.377 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:55:02.688 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:55:02.789 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:04.049 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:04.049 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:04.051 | WARNING  | app.services.limit_monitor.monitor:fetch_limit_data:136 - 无法获取A股列表，回退到热门股票扫描
+2026-06-16 11:55:04.220 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 20/20 只股票
+2026-06-16 11:55:04.220 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:55:04.221 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:55:04.221 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:55:05.511 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:55:05.511 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:55:05.512 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:55:05.546 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:55:07.392 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:55:07.393 | INFO     | app.services.auction_engine.engine:run_auction_analysis:125 - 开始竞价分析...
+2026-06-16 11:55:07.571 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 117/117 只股票
+2026-06-16 11:55:07.848 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:08.690 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:55:08.690 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:55:08.690 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:55:08.725 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:55:08.812 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:10.065 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:10.066 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:10.314 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:11.069 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:11.508 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:55:11.509 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:55:11.509 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:55:11.545 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:55:12.329 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:12.330 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:12.331 | WARNING  | app.services.limit_monitor.monitor:fetch_limit_data:136 - 无法获取A股列表，回退到热门股票扫描
+2026-06-16 11:55:12.499 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 20/20 只股票
+2026-06-16 11:55:12.499 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:55:12.500 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:55:12.500 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:55:14.376 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:55:14.376 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:55:14.376 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:55:14.591 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:55:15.673 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:55:15.673 | INFO     | app.services.auction_engine.engine:run_auction_analysis:125 - 开始竞价分析...
+2026-06-16 11:55:15.853 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 117/117 只股票
+2026-06-16 11:55:16.115 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:16.879 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:17.509 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:55:17.510 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:55:17.510 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:55:17.542 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:55:18.141 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:18.141 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:18.398 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:19.177 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:20.408 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:55:20.410 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:55:20.411 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:55:20.556 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:20.557 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:20.558 | WARNING  | app.services.limit_monitor.monitor:fetch_limit_data:136 - 无法获取A股列表，回退到热门股票扫描
+2026-06-16 11:55:20.727 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:55:20.730 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 20/20 只股票
+2026-06-16 11:55:20.730 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:55:20.730 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:55:20.730 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:55:23.510 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:55:23.510 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:55:23.510 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:55:23.544 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:55:23.897 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:55:23.897 | INFO     | app.services.auction_engine.engine:run_auction_analysis:125 - 开始竞价分析...
+2026-06-16 11:55:24.067 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 117/117 只股票
+2026-06-16 11:55:24.270 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:24.979 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:26.179 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:26.179 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:26.508 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:26.509 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:55:26.511 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:55:26.511 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:55:26.545 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:55:27.205 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:28.401 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:28.402 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:28.404 | WARNING  | app.services.limit_monitor.monitor:fetch_limit_data:136 - 无法获取A股列表，回退到热门股票扫描
+2026-06-16 11:55:28.583 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 20/20 只股票
+2026-06-16 11:55:28.583 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:55:28.583 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:55:28.583 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:55:29.524 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:55:29.524 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:55:29.524 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:55:29.557 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:55:31.756 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:55:31.757 | INFO     | app.services.auction_engine.engine:run_auction_analysis:125 - 开始竞价分析...
+2026-06-16 11:55:31.928 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 117/117 只股票
+2026-06-16 11:55:32.148 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:32.372 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:55:32.372 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:55:32.372 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:55:32.546 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:55:32.839 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:34.051 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:34.052 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:34.260 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:34.961 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:35.506 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:55:35.519 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:55:35.520 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:55:35.555 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:55:36.216 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:36.216 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:36.218 | WARNING  | app.services.limit_monitor.monitor:fetch_limit_data:136 - 无法获取A股列表，回退到热门股票扫描
+2026-06-16 11:55:36.391 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 20/20 只股票
+2026-06-16 11:55:36.391 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:55:36.391 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:55:36.391 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:55:38.519 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:55:38.520 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:55:38.520 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:55:38.552 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:55:39.564 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:55:39.564 | INFO     | app.services.auction_engine.engine:run_auction_analysis:125 - 开始竞价分析...
+2026-06-16 11:55:39.743 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 117/117 只股票
+2026-06-16 11:55:39.950 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:40.670 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:41.372 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:55:41.373 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:55:41.373 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:55:41.546 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:55:41.884 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:41.885 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:42.101 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:42.858 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:44.119 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:44.120 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:44.121 | WARNING  | app.services.limit_monitor.monitor:fetch_limit_data:136 - 无法获取A股列表，回退到热门股票扫描
+2026-06-16 11:55:44.292 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 20/20 只股票
+2026-06-16 11:55:44.292 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:55:44.292 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:55:44.292 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:55:44.515 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:55:44.516 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:55:44.516 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:55:44.550 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:55:47.434 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:55:47.435 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:55:47.435 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:55:47.606 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:55:47.606 | INFO     | app.services.auction_engine.engine:run_auction_analysis:125 - 开始竞价分析...
+2026-06-16 11:55:47.744 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:55:47.782 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 117/117 只股票
+2026-06-16 11:55:47.989 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:48.681 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:49.876 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:49.877 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:50.093 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:50.506 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:55:50.507 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:55:50.507 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:55:50.540 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:55:50.784 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:51.977 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:51.977 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:51.979 | WARNING  | app.services.limit_monitor.monitor:fetch_limit_data:136 - 无法获取A股列表，回退到热门股票扫描
+2026-06-16 11:55:52.147 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 20/20 只股票
+2026-06-16 11:55:52.148 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:55:52.148 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:55:52.148 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:55:53.516 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:55:53.516 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:55:53.517 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:55:53.549 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:55:55.322 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:55:55.323 | INFO     | app.services.auction_engine.engine:run_auction_analysis:125 - 开始竞价分析...
+2026-06-16 11:55:55.494 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 117/117 只股票
+2026-06-16 11:55:55.697 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:56.374 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:55:56.374 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:55:56.374 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:55:56.511 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:56.543 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:55:57.702 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:57.702 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:57.905 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:58.597 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:59.507 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:55:59.507 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:55:59.508 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:55:59.553 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:55:59.787 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:59.787 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:55:59.788 | WARNING  | app.services.limit_monitor.monitor:fetch_limit_data:136 - 无法获取A股列表，回退到热门股票扫描
+2026-06-16 11:55:59.955 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 20/20 只股票
+2026-06-16 11:55:59.955 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:55:59.955 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:55:59.955 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:56:02.513 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:56:02.513 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:56:02.513 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:56:02.551 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:56:03.130 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:56:03.130 | INFO     | app.services.auction_engine.engine:run_auction_analysis:125 - 开始竞价分析...
+2026-06-16 11:56:03.306 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 117/117 只股票
+2026-06-16 11:56:03.507 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:04.193 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:05.511 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:05.511 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:05.649 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:56:05.650 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:56:05.650 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:56:05.682 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:56:05.701 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:06.396 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:07.593 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:07.593 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:07.595 | WARNING  | app.services.limit_monitor.monitor:fetch_limit_data:136 - 无法获取A股列表，回退到热门股票扫描
+2026-06-16 11:56:07.811 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 20/20 只股票
+2026-06-16 11:56:07.818 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:56:07.820 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:56:07.820 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:56:08.508 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:56:08.509 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:56:08.509 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:56:08.550 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:56:10.993 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:56:10.993 | INFO     | app.services.auction_engine.engine:run_auction_analysis:125 - 开始竞价分析...
+2026-06-16 11:56:11.165 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 117/117 只股票
+2026-06-16 11:56:11.363 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:11.371 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:56:11.371 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:56:11.371 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:56:11.542 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:56:12.051 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:13.245 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:13.245 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:13.438 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:14.129 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:14.519 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:56:14.520 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:56:14.520 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:56:14.557 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:56:15.316 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:15.316 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:15.317 | WARNING  | app.services.limit_monitor.monitor:fetch_limit_data:136 - 无法获取A股列表，回退到热门股票扫描
+2026-06-16 11:56:15.485 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 20/20 只股票
+2026-06-16 11:56:15.485 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:56:15.486 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:56:15.486 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:56:17.508 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:56:17.508 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:56:17.509 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:56:17.545 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:56:18.662 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:56:18.662 | INFO     | app.services.auction_engine.engine:run_auction_analysis:125 - 开始竞价分析...
+2026-06-16 11:56:18.843 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 117/117 只股票
+2026-06-16 11:56:19.043 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:19.736 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:20.510 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:56:20.510 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:56:20.510 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:56:20.546 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:56:20.931 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:20.931 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:21.120 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:21.814 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:23.006 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:23.007 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:23.008 | WARNING  | app.services.limit_monitor.monitor:fetch_limit_data:136 - 无法获取A股列表，回退到热门股票扫描
+2026-06-16 11:56:23.254 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 20/20 只股票
+2026-06-16 11:56:23.255 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:56:23.255 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:56:23.255 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:56:23.522 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:56:23.522 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:56:23.523 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:56:23.558 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:56:26.725 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:56:26.726 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:56:26.726 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:56:26.767 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:56:26.776 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:56:26.778 | INFO     | app.services.auction_engine.engine:run_auction_analysis:125 - 开始竞价分析...
+2026-06-16 11:56:27.059 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 117/117 只股票
+2026-06-16 11:56:27.431 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:28.239 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:29.526 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:56:29.526 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:56:29.526 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:56:29.562 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:56:29.579 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:29.580 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:29.767 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:30.458 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:31.654 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:31.654 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:31.656 | WARNING  | app.services.limit_monitor.monitor:fetch_limit_data:136 - 无法获取A股列表，回退到热门股票扫描
+2026-06-16 11:56:31.824 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 20/20 只股票
+2026-06-16 11:56:31.824 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:56:31.824 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:56:31.825 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:56:32.370 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:56:32.371 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:56:32.371 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:56:32.549 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:56:34.998 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:56:34.998 | INFO     | app.services.auction_engine.engine:run_auction_analysis:125 - 开始竞价分析...
+2026-06-16 11:56:35.178 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 117/117 只股票
+2026-06-16 11:56:35.371 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:56:35.371 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:56:35.371 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:56:35.512 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:35.544 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:56:36.207 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:37.401 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:37.402 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:37.591 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:38.278 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:38.516 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:56:38.517 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:56:38.517 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:56:38.550 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:56:39.469 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:39.470 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:39.471 | WARNING  | app.services.limit_monitor.monitor:fetch_limit_data:136 - 无法获取A股列表，回退到热门股票扫描
+2026-06-16 11:56:39.703 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 20/20 只股票
+2026-06-16 11:56:39.704 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:56:39.704 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:56:39.704 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:56:41.510 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:56:41.510 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:56:41.510 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:56:41.543 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:56:42.874 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:56:42.874 | INFO     | app.services.auction_engine.engine:run_auction_analysis:125 - 开始竞价分析...
+2026-06-16 11:56:43.051 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 117/117 只股票
+2026-06-16 11:56:43.250 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:43.942 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:44.372 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:56:44.373 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:56:44.373 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:56:44.543 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票
+2026-06-16 11:56:45.144 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:45.144 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:45.348 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [1/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:46.078 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [2/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:47.301 | WARNING  | app.services.data_collector.sina_api:_request_with_retry:49 - HTTP错误 [3/3]: 502 - http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:47.302 | ERROR    | app.services.data_collector.sina_api:_request_with_retry:57 - 请求最终失败（已重试3次）: http://push2.eastmoney.com/api/qt/clist/get
+2026-06-16 11:56:47.305 | WARNING  | app.services.limit_monitor.monitor:fetch_limit_data:136 - 无法获取A股列表，回退到热门股票扫描
+2026-06-16 11:56:47.611 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:56:47.611 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:56:47.612 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:56:47.643 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 20/20 只股票
+2026-06-16 11:56:47.643 | INFO     | app.services.open_confirm.confirm:analyze_watchlist:191 - 自选股列表为空，跳过开盘确认分析
+2026-06-16 11:56:47.644 | INFO     | app.services.morning_breakout.breakout:analyze_watchlist:238 - 自选股列表为空，跳过早盘突破分析
+2026-06-16 11:56:47.644 | INFO     | app.services.afternoon_stable.stable:analyze_watchlist:274 - 自选股列表为空，跳过尾盘稳健分析
+2026-06-16 11:56:47.648 | DEBUG    | app.services.data_collector.sina_api:get_quotes:341 - 新浪数据源成功获取 5/5 只股票

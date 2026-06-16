@@ -86,6 +86,13 @@ const HistoryReplay: React.FC = () => {
     }
   }, [code, date])
 
+  // 回放结束时自动生成报告
+  useEffect(() => {
+    if (ticks.length > 0 && currentIndex === ticks.length - 1 && !report) {
+      generateReport()
+    }
+  }, [currentIndex, ticks.length, report, generateReport])
+
   useEffect(() => {
     if (isPlaying && currentIndex < ticks.length - 1) {
       intervalRef.current = setInterval(() => {
