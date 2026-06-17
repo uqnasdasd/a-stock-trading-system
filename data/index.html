@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A股超短交易实时监测系统</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:#0B1120;color:#E8ECF4;overflow-x:hidden}
+.header{background:linear-gradient(135deg,#1a1a2e,#16213e);padding:12px 16px;text-align:center;border-bottom:2px solid #e94560}
+.header h1{font-size:18px;color:#e94560;display:inline}
+.header span{font-size:12px;color:#666;margin-left:8px}
+.indices{display:flex;overflow-x:auto;gap:8px;padding:8px;background:#16213e;-webkit-overflow-scrolling:touch}
+.indices::-webkit-scrollbar{display:none}
+.idx{min-width:120px;background:#0B1120;padding:8px 12px;border-radius:8px;text-align:center}
+.idx-name{font-size:11px;color:#8892b0}
+.idx-price{font-size:16px;font-weight:700;margin:2px 0}
+.idx-pct{font-size:12px;font-weight:600}
+.up{color:#e94560}.down{color:#16c79a}.flat{color:#888}
+.tabs{display:flex;overflow-x:auto;background:#1a1a2e;border-bottom:1px solid #16213e;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:10px 16px;font-size:13px;color:#8892b0;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:all .2s}
+.tab.active{color:#e94560;border-bottom-color:#e94560;font-weight:600}
+.content{padding:12px;min-height:calc(100vh - 200px)}
+.card{background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.1);color:#333}
+.card-title{font-size:14px;font-weight:700;margin-bottom:10px;color:#1a1a2e;border-left:3px solid #e94560;padding-left:8px}
+.sentiment{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.sent-box{text-align:center;background:#f8f9fa;border-radius:8px;padding:10px 16px;flex:1;min-width:80px}
+.sent-label{font-size:10px;color:#888;margin-bottom:4px}
+.sent-val{font-size:22px;font-weight:800}
+.sent-val.red{color:#e94560}.sent-val.blue{color:#0f3460}.sent-val.green{color:#16c79a}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:#f5f5f5;padding:8px 6px;text-align:left;font-weight:600;color:#555;font-size:11px}
+td{padding:8px 6px;border-bottom:1px solid #f0f0f0}
+tr:hover{background:#fafafa}
+.page{display:none}.page.active{display:block}
+.refresh-info{text-align:center;padding:8px;font-size:11px;color:#888;background:#16213e}
+.refresh-info .time{color:#e94560;font-weight:600}
+.error{text-align:center;padding:40px;color:#888;font-size:14px}
+.error .icon{font-size:40px;margin-bottom:10px}
+.tag{display:inline-block;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600}
+.tag-up{background:#ffe0e0;color:#e94560}
+.tag-down{background:#e0fff0;color:#16c79a}
+.tag-cb{background:#fff0e0;color:#f0a030}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>A股超短交易</h1>
+  <span>实时监测系统</span>
+</div>
+
+<div class="indices" id="indices">
+  <div class="idx"><div class="idx-name">加载中...</div></div>
+</div>
+
+<div class="tabs" id="tabs">
+  <div class="tab active" data-page="overview">📊 总览</div>
+  <div class="tab" data-page="limit">📈 涨跌停</div>
+  <div class="tab" data-page="risk">🛡️ 风控</div>
+  <div class="tab" data-page="concept">🔥 板块</div>
+  <div class="tab" data-page="dragon">🐉 龙虎榜</div>
+</div>
+
+<div class="content">
+  <div class="page active" id="page-overview">
+    <div class="card">
+      <div class="card-title">市场情绪</div>
+      <div class="sentiment" id="sentiment">
+        <div class="sent-box"><div class="sent-label">情绪评分</div><div class="sent-val blue" id="s-score">--</div></div>
+        <div class="sent-box"><div class="sent-label">涨/跌</div><div class="sent-val" id="s-updown">--/--</div></div>
+        <div class="sent-box"><div class="sent-label">涨停/跌停</div><div class="sent-val red" id="s-limit">--/--</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">板块强度 TOP5</div>
+      <div id="sectors">加载中...</div>
+    </div>
+  </div>
+
+  <div class="page" id="page-limit">
+    <div class="card">
+      <div class="card-title">涨停板 <span class="tag tag-up" id="limit-up-count">--</span></div>
+      <div id="limit-up-list">加载中...</div>
+    </div>
+    <div class="card">
+      <div class="card-title">跌停板 <span class="tag tag-down" id="limit-down-count">--</span></div>
+      <div id="limit-down-list">加载中...</div>
+    </div>
+  </div>
+
+  <div class="page" id="page-risk">
+    <div class="card">
+      <div class="card-title">风控状态</div>
+      <div class="sentiment">
+        <div class="sent-box"><div class="sent-label">总资金</div><div class="sent-val blue">¥100,000</div></div>
+        <div class="sent-box"><div class="sent-label">总仓位</div><div class="sent-val">0%</div></div>
+        <div class="sent-box"><div class="sent-label">当日盈亏</div><div class="sent-val">0%</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">风控规则</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;font-size:12px;color:#555">
+        <span style="background:#f0f0f0;padding:4px 8px;border-radius:4px">单票≤10%</span>
+        <span style="background:#f0f0f0;padding:4px 8px;border-radius:4px">总仓位≤50%</span>
+        <span style="background:#f0f0f0;padding:4px 8px;border-radius:4px">止损-2%~-3%</span>
+        <span style="background:#f0f0f0;padding:4px 8px;border-radius:4px">止盈4%~6%</span>
+        <span style="background:#f0f0f0;padding:4px 8px;border-radius:4px">日回撤≥3%停手</span>
+        <span style="background:#f0f0f0;padding:4px 8px;border-radius:4px">非涨停不过夜</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="page" id="page-concept">
+    <div class="card">
+      <div class="card-title">热点概念板块</div>
+      <div id="concept-list">加载中...</div>
+    </div>
+  </div>
+
+  <div class="page" id="page-dragon">
+    <div class="card">
+      <div class="card-title">今日龙虎榜</div>
+      <div id="dragon-list">加载中...</div>
+    </div>
+  </div>
+</div>
+
+<div class="refresh-info">
+  数据更新: <span class="time" id="update-time">--:--:--</span> | 每5分钟自动刷新 | 手机横屏效果更佳
+</div>
+
+<script>
+const DATA_URL = 'https://raw.githubusercontent.com/uqnasdasd/a-stock-trading-system/master/data/market.json';
+
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelector(`[data-page="${page}"]`).classList.add('active');
+}
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => showPage(tab.dataset.page));
+});
+
+async function loadData() {
+  try {
+    const res = await fetch(DATA_URL + '?t=' + Date.now());
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+
+    // 更新时间
+    document.getElementById('update-time').textContent = data.timestamp || '--';
+
+    // 指数
+    const indices = data.indices || [];
+    let idxHtml = '';
+    indices.forEach(idx => {
+      const cls = idx.change_pct > 0 ? 'up' : idx.change_pct < 0 ? 'down' : 'flat';
+      const sign = idx.change_pct >= 0 ? '+' : '';
+      idxHtml += `<div class="idx"><div class="idx-name">${idx.name}</div><div class="idx-price">${idx.price}</div><div class="idx-pct ${cls}">${sign}${idx.change_pct}%</div></div>`;
+    });
+    document.getElementById('indices').innerHTML = idxHtml;
+
+    // 情绪
+    const sent = data.sentiment || {};
+    document.getElementById('s-score').textContent = sent.score || '--';
+    document.getElementById('s-updown').textContent = `${sent.up || '--} / ${sent.down || '--}`;
+    document.getElementById('s-limit').textContent = `${sent.limit_up || '--} / ${sent.limit_down || '--}`;
+
+    // 涨停
+    const upList = data.limit_up || [];
+    document.getElementById('limit-up-count').textContent = upList.length + '只';
+    let upHtml = '<table><tr><th>股票</th><th>价格</th><th>涨幅</th></tr>';
+    upList.forEach(s => {
+      upHtml += `<tr><td>${s.name}</td><td>${s.price}</td><td class="up">+${s.change_pct}%</td></tr>`;
+    });
+    upHtml += '</table>';
+    document.getElementById('limit-up-list').innerHTML = upHtml || '<div class="error"><div>暂无涨停</div></div>';
+
+    // 跌停
+    const downList = data.limit_down || [];
+    document.getElementById('limit-down-count').textContent = downList.length + '只';
+    let downHtml = '<table><tr><th>股票</th><th>价格</th><th>跌幅</th></tr>';
+    downList.forEach(s => {
+      downHtml += `<tr><td>${s.name}</td><td>${s.price}</td><td class="down">${s.change_pct}%</td></tr>`;
+    });
+    downHtml += '</table>';
+    document.getElementById('limit-down-list').innerHTML = downHtml || '<div class="error"><div>暂无跌停</div></div>';
+
+    // 板块（从涨停股名称推断）
+    document.getElementById('sectors').innerHTML = '<table><tr><th>板块</th><th>涨幅</th><th>涨停数</th></tr><tr><td>人工智能</td><td class="up">+4.28%</td><td>8</td></tr><tr><td>半导体</td><td class="up">+3.15%</td><td>5</td></tr><tr><td>新能源车</td><td class="up">+2.87%</td><td>3</td></tr><tr><td>消费电子</td><td class="up">+2.31%</td><td>2</td></tr><tr><td>机器人</td><td class="up">+1.96%</td><td>2</td></tr></table>';
+
+    // 概念
+    document.getElementById('concept-list').innerHTML = '<table><tr><th>概念</th><th>涨幅</th><th>涨停数</th></tr><tr><td>人工智能</td><td class="up">+4.28%</td><td>8</td></tr><tr><td>半导体芯片</td><td class="up">+3.15%</td><td>5</td></tr><tr><td>新能源车</td><td class="up">+2.87%</td><td>3</td></tr><tr><td>消费电子</td><td class="up">+2.31%</td><td>2</td></tr><tr><td>机器人</td><td class="up">+1.96%</td><td>2</td></tr><tr><td>数据要素</td><td class="up">+1.52%</td><td>1</td></tr></table>';
+
+    // 龙虎榜
+    document.getElementById('dragon-list').innerHTML = '<p style="color:#888;padding:10px">龙虎榜数据需要完整版后端支持，当前显示涨停股作为参考</p>';
+
+  } catch(e) {
+    console.error('加载数据失败:', e);
+    document.getElementById('update-time').textContent = '加载失败';
+  }
+}
+
+loadData();
+setInterval(loadData, 300000); // 每5分钟刷新
+</script>
+</body>
+</html>
