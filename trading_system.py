@@ -416,10 +416,53 @@ async def health_check():
 
 
 if __name__ == "__main__":
+    import subprocess as sp
+    import webbrowser
+
     print("=" * 50)
-    print("A股超短交易实时监测系统 v2.4")
+    print("  A股超短交易实时监测系统 v2.4")
     print("=" * 50)
-    print("正在启动...")
-    print("启动后请打开浏览器访问: http://localhost:8000")
+
+    # 检查依赖
+    try:
+        import fastapi
+        import uvicorn
+    except ImportError:
+        print("\n首次运行，正在安装依赖（1-2分钟）...")
+        print("请耐心等待...\n")
+        import subprocess
+        deps = ["fastapi", "uvicorn", "python-multipart"]
+        for dep in deps:
+            try:
+                subprocess.check_call([sys.executable, "-m", "pip", "install", dep, "--quiet", "--break-system-packages"])
+            except:
+                subprocess.check_call([sys.executable, "-m", "pip", "install", dep, "--quiet"])
+        print("依赖安装完成！\n")
+
+    print("正在启动系统...")
+    print("启动后浏览器会自动打开")
+    print("地址: http://localhost:8000")
     print("=" * 50)
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    print("\n如果浏览器没有自动打开，请手动访问上面的地址")
+    print("按 Ctrl+C 停止系统\n")
+
+    # 延迟打开浏览器
+    def open_browser():
+        import time
+        time.sleep(3)
+        webbrowser.open("http://localhost:8000")
+
+    import threading
+    threading.Thread(target=open_browser, daemon=True).start()
+
+    try:
+        uvicorn.run(app, host="0.0.0.0", port=8000)
+    except KeyboardInterrupt:
+        print("\n系统已停止")
+    except Exception as e:
+        print(f"\n启动失败: {e}")
+        print("\n可能的原因:")
+        print("1. 端口8000被占用 → 关闭其他程序后重试")
+        print("2. Python版本太低 → 需要Python 3.7+")
+        print("3. 网络问题 → 检查网络连接")
+        input("\n按回车键退出...")
