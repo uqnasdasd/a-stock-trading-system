@@ -1,136 +1,79 @@
-# A股超短交易实时监测系统
+# A股超短交易实时监测系统 v2.4
 
-融合4篇"论道至简"短线交易教程操作模式的可执行程序软件。
+## 在线演示（手机/电脑直接打开）
 
-## 核心功能模块
+**点击下方链接，无需安装，直接查看：**
 
-| 模块 | 功能 | 对应教程 |
-|------|------|----------|
-| M1 竞价引擎 | 9:15-9:25 板块强度/龙头评分/情绪晴雨表 | 竞价选股 |
-| M2 开盘确认 | 9:30-9:35 板块持续性/量比验证 | 竞价选股 |
-| M3 持仓监控 | 龙头追踪/分时支撑/量价关系 | 持仓判断 |
-| M4 清仓预警 | 炸板检测/量价背离/止盈止损 | 持仓判断 |
-| M8 风控中枢 | 仓位/回撤/交易频率/隔夜风控 | 超短交易系统 |
+👉 [A股超短交易实时监测系统 - 在线演示](https://htmlpreview.github.io/?https://github.com/uqnasdasd/a-stock-trading-system/blob/main/a-stock-trading-demo.html)
 
-## 技术栈
-
-- **后端**: FastAPI + Python 3.11 + WebSocket
-- **前端**: React 18 + TypeScript + Vite
-- **数据**: 新浪财经API（免费实时行情）
-- **部署**: Docker Compose
-
-## 快速启动
-
-### 方式一：本地开发启动
-
-```bash
-# 1. 启动后端
-cd backend
-pip install -r requirements.txt
-python main.py
-# 后端运行在 http://localhost:8000
-
-# 2. 启动前端（新终端）
-cd frontend
-npm install
-npm run dev
-# 前端运行在 http://localhost:5173
+或者复制这个链接到浏览器：
+```
+https://htmlpreview.github.io/?https://github.com/uqnasdasd/a-stock-trading-system/blob/main/a-stock-trading-demo.html
 ```
 
-### 方式二：Docker Compose 部署
+---
 
-```bash
-# 1. 配置环境变量（可选）
-cp backend/.env.example backend/.env
-# 编辑 .env 填入钉钉/企微Webhook地址
+## 本地安装（完整版带实时数据）
 
-# 2. 启动全部服务
-docker-compose up -d
+### 只需要装 Python！
 
-# 3. 访问前端
-open http://localhost:5173
-```
+1. **安装 Python 3.10+**
+   - 打开 https://www.python.org/downloads/
+   - 下载安装，**务必勾选 "Add Python to PATH"**
 
-## 系统界面
+2. **下载代码**
+   - 打开 https://github.com/uqnasdasd/a-stock-trading-system
+   - 点击 Code → Download ZIP
+   - 解压到桌面
 
-- **顶部**: 大盘指数栏（上证/深证/创业板/沪深300/中证500）
-- **左侧Tab**: 竞价引擎 / 持仓监控 / 信号列表
-- **右侧**: 风控中心面板
+3. **双击 start.bat**
+   - 首次运行会自动安装依赖
+   - 浏览器自动打开 http://localhost:8000
 
-## 风控规则（硬编码）
+---
 
-| 规则 | 阈值 | 触发动作 |
-|------|------|----------|
-| 单票仓位 | ≤ 10% | 超限告警 |
-| 总仓位 | ≤ 50% | 禁止开新仓 |
-| 止损线 | -2% ~ -3% | 立即清仓 |
-| 止盈线 | +4% ~ +6% | 减仓50% |
-| 单日回撤 | ≥ 3% | 当日停手 |
-| 周度回撤 | ≥ 5% | 暂停1-2天 |
-| 交易频率 | 日≤2次 / 周≤5次 | 超限禁止交易 |
-| 隔夜风控 | 非涨停股 | 收盘前清仓 |
+## 功能模块
 
-## API 接口
+- 📊 大盘总览（指数/情绪/板块/龙头）
+- 🔥 竞价引擎（9:15-9:25实时分析）
+- 📋 持仓监控（止损/止盈/移动止盈）
+- 🚨 信号预警（开盘确认/早盘突破/尾盘稳健）
+- 📈 涨跌停监控（全A股5000+）
+- ⭐ 自选股管理
+- 🔥 概念板块追踪
+- 🐉 龙虎榜数据
+- 📝 交易日志
+- 🛡️ 风控中心
+- 📉 策略回测
+- ⏸ 历史数据回放
 
-| 接口 | 方法 | 说明 |
-|------|------|------|
-| `/api/market/indices` | GET | 大盘指数 |
-| `/api/auction/analyze` | POST | 竞价分析 |
-| `/api/positions` | GET/POST/DELETE | 持仓管理 |
-| `/api/risk/status` | GET | 风控状态 |
-| `/api/signals` | GET | 信号列表 |
-| `/ws` | WebSocket | 实时数据推送 |
+---
 
-## 配置文件
+## 更新日志
 
-编辑 `backend/.env`：
+### v2.4 (2026-06-17)
+- 修复后端启动问题
+- 简化安装流程（只需Python）
+- 添加在线演示版
+- 修复风控API字段缺失
+- 修复bat文件换行符问题
 
-```env
-# 告警推送（可选）
-DINGTALK_WEBHOOK=https://oapi.dingtalk.com/robot/send?access_token=xxx
-WECHAT_WEBHOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxx
+### v2.3 (2026-06-16)
+- 添加accounts API和数据库表
+- 修复ConceptPanel/DragonTiger导航
+- 修复数据流不通问题
 
-# 风控参数
-MAX_SINGLE_POSITION=0.10
-MAX_TOTAL_POSITION=0.50
-STOP_LOSS_PCT=0.03
-TAKE_PROFIT_PCT=0.05
-DAILY_MAX_LOSS=0.03
-WEEKLY_MAX_LOSS=0.05
-MAX_TRADES_PER_DAY=2
-MAX_TRADES_PER_WEEK=5
-```
+### v2.2 (2026-06-16)
+- 修复HTTPException导入
+- 修复useMarketData数据请求
+- 修复Dashboard字段映射
 
-## 项目结构
-
-```
-a-stock-trading-system/
-├── backend/              # FastAPI 后端
-│   ├── app/
-│   │   ├── api/routes.py         # API路由 + WebSocket
-│   │   ├── core/config.py        # 配置管理
-│   │   ├── models/schemas.py     # 数据模型
-│   │   └── services/
-│   │       ├── auction_engine/   # M1 竞价引擎
-│   │       ├── position_monitor/ # M3+M4 持仓监控
-│   │       ├── risk_control/     # M8 风控中枢
-│   │       ├── alert_push/       # 告警推送
-│   │       └── data_collector/   # 数据采集
-│   ├── main.py
-│   ├── requirements.txt
-│   └── Dockerfile
-├── frontend/             # React 前端
-│   ├── src/
-│   │   ├── components/   # 面板组件
-│   │   ├── pages/        # Dashboard
-│   │   └── hooks/        # WebSocket Hook
-│   ├── package.json
-│   ├── Dockerfile
-│   └── nginx.conf
-├── docker-compose.yml
-└── README.md
-```
-
-## 免责声明
-
-本系统仅供学习研究使用，不构成任何投资建议。股市有风险，投资需谨慎。
+### v2.1 (2026-06-16)
+- 数据源容错切换（新浪/腾讯/东方财富）
+- 涨跌停覆盖全部A股5000+
+- 动态板块映射
+- 风控数据持久化
+- 移动止盈修复
+- 开盘确认/早盘突破/尾盘稳健信号
+- 策略回测后端
+- 历史数据回放
