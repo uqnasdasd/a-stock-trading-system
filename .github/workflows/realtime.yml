@@ -1,0 +1,30 @@
+name: Real-time Market Data
+
+on:
+  schedule:
+    # 每5分钟运行一次（A股交易时间：北京时间 9:00-15:30）
+    - cron: '*/5 1-7 * * 1-5'
+    # UTC 1:00-7:30 = 北京时间 9:00-15:30，周一到周五
+  workflow_dispatch:  # 手动触发
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Fetch data and generate report
+        run: python scripts/auto_report_v2.py
+        env:
+          GIT_AUTHOR_NAME: github-actions[bot]
+          GIT_AUTHOR_EMAIL: github-actions[bot]@users.noreply.github.com
+          GIT_COMMITTER_NAME: github-actions[bot]
+          GIT_COMMITTER_EMAIL: github-actions[bot]@users.noreply.github.com
