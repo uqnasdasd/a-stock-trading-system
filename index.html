@@ -60,9 +60,7 @@ body {
 .card-value.green { color: var(--green); }
 .card-value.gold { color: var(--gold); }
 .card-note { font-size: 11px; color: var(--muted); margin-top: 4px; }
-.sentiment-box {
-  display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px;
-}
+.sentiment-box { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
 .sent-item {
   text-align: center; background: var(--surface); border-radius: 8px;
   padding: 10px 16px; flex: 1; min-width: 80px;
@@ -121,10 +119,10 @@ body {
 <div class="container">
 
   <div class="header">
-    <h1>A股小幅低开 —— 关注修复力度</h1>
+    <h1>A股低开调整 —— 关注修复力度</h1>
     <div class="header-meta">
-      <span>数据时间: 2026-06-18 01:03:33</span>
-      <span>情绪: 中性偏空</span>
+      <span>数据时间: 2026-06-18 03:57:33</span>
+      <span>情绪: 偏空</span>
       <span>来源: 新浪/东方财富</span>
     </div>
   </div>
@@ -135,75 +133,71 @@ body {
       
         <div class="card blue">
             <div class="card-label">上证指数</div>
-            <div class="card-value blue">4106.93</div>
-            <div class="card-note">-0.03%</div>
+            <div class="card-value blue">4092.76</div>
+            <div class="card-note">-0.37% · 成交额0亿</div>
         </div>
-        <div class="card blue">
+        <div class="card red">
             <div class="card-label">深证成指</div>
-            <div class="card-value blue">0.00</div>
-            <div class="card-note">-100.00%</div>
+            <div class="card-value red">15970.86</div>
+            <div class="card-note">+0.57% · 成交额0亿</div>
         </div>
-        <div class="card blue">
+        <div class="card red">
             <div class="card-label">创业板指</div>
-            <div class="card-value blue">0.00</div>
-            <div class="card-note">-100.00%</div>
+            <div class="card-value red">4224.96</div>
+            <div class="card-note">+1.39% · 成交额0亿</div>
         </div>
-        <div class="card blue">
+        <div class="card red">
             <div class="card-label">沪深300</div>
-            <div class="card-value blue">4930.76</div>
-            <div class="card-note">-0.01%</div>
+            <div class="card-value red">4937.53</div>
+            <div class="card-note">+0.12% · 成交额0亿</div>
         </div>
-        <div class="card blue">
+        <div class="card red">
             <div class="card-label">中证500</div>
-            <div class="card-value blue">8623.24</div>
-            <div class="card-note">-0.04%</div>
+            <div class="card-value red">8655.36</div>
+            <div class="card-note">+0.33% · 成交额0亿</div>
         </div>
+      
+    <div class="card red">
+        <div class="card-label">北向资金</div>
+        <div class="card-value red">0.0亿</div>
+        <div class="card-note">今日流出 · 关注权重股</div>
+    </div>
     </div>
     <div class="sentiment-box">
       <div class="sent-item">
-        <div class="sent-label">情绪评分</div>
-        <div class="sent-val gold">0</div>
+        <div class="sent-label">上证指数</div>
+        <div class="sent-val red">-0.37%</div>
       </div>
       <div class="sent-item">
-        <div class="sent-label">涨/跌</div>
-        <div class="sent-val">0/5</div>
+        <div class="sent-label">深成指</div>
+        <div class="sent-val red">+0.57%</div>
+      </div>
+      <div class="sent-item">
+        <div class="sent-label">创业板指</div>
+        <div class="sent-val red">+1.39%</div>
       </div>
       <div class="sent-item">
         <div class="sent-label">涨停/跌停</div>
-        <div class="sent-val red">0/0</div>
+        <div class="sent-val red">50/0</div>
       </div>
     </div>
   </div>
 
   <div class="section">
-    <div class="section-title blue">→ 市场逻辑</div>
+    <div class="section-title blue">→ 市场逻辑链</div>
     
         <div class="logic-item">
-            <div class="logic-num ">①</div>
+            <div class="logic-num blue">①</div>
             <div class="logic-content">
-                <h3>指数承压</h3>
-                <p>上证指数-0.03%，市场情绪谨慎，关注权重股表现</p>
+                <h3>指数震荡</h3>
+                <p>上证指数-0.37%，深成指+0.57%。指数波动不大，市场等待方向选择。</p>
             </div>
         </div>
         <div class="logic-item">
-            <div class="logic-num blue">②</div>
+            <div class="logic-num green">④</div>
             <div class="logic-content">
-                <h3>涨停稀少</h3>
-                <p>涨停0只，短线情绪低迷，观望为主</p>
-            </div>
-        </div>
-        <div class="logic-item">
-            <div class="logic-num green">③</div>
-            <div class="logic-content">
-                <h3>板块轮动</h3>
-                <p>关注AI、半导体、新能源等主线板块轮动节奏</p>
-            </div>
-        </div>
-        <div class="logic-item">
-            <div class="logic-num gold">④</div>
-            <div class="logic-content">
-                <h3>策略建议</h3>
-                <p>严格控制仓位，单票不超过10%，总仓位不超过50%</p>
+                <h3>涨停50只 —— 短线情绪高涨</h3>
+                <p>涨停数量超过30只，短线资金活跃，但需警惕过热后的分化风险。</p>
             </div>
         </div>
   </div>
@@ -224,21 +218,45 @@ body {
             <td><span class="signal-badge blue">中</span></td>
         </tr>
         <tr>
-            <td><strong>半导体</strong></td>
-            <td><span class="signal-badge gold">观望</span></td>
-            <td>芯片/PCB</td>
-            <td>等待企稳信号</td>
-            <td><span class="signal-badge blue">低</span></td>
+            <td><strong>情绪过热</strong></td>
+            <td><span class="signal-badge red">看空</span></td>
+            <td>减仓/兑现</td>
+            <td>涨停过多，情绪过热，警惕分化</td>
+            <td><span class="signal-badge blue">中</span></td>
         </tr>
       </tbody>
     </table>
   </div>
 
   <div class="section">
-    <div class="section-title gold">📈 涨停榜 (0只)</div>
+    <div class="section-title gold">🔥 板块资金流向 TOP5</div>
     <table class="signal-table">
       <thead>
-        <tr><th>股票</th><th>价格</th><th>涨幅</th></tr>
+        <tr><th>板块</th><th>涨幅</th><th>主力净流入</th></tr>
+      </thead>
+      <tbody>
+        
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">📈 涨停榜 (50只)</div>
+    <table class="signal-table">
+      <thead>
+        <tr><th>股票</th><th>价格</th><th>涨幅</th><th>封单</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>冰轮环境</td><td>401.70</td><td class="up">+9.99%</td><td>13836万</td></tr><tr><td>中嘉博创</td><td>40.20</td><td class="up">+10.14%</td><td>17368万</td></tr><tr><td>华瓷股份</td><td>174.00</td><td class="up">+9.99%</td><td>4292万</td></tr><tr><td>东方锆业</td><td>161.30</td><td class="up">+10.03%</td><td>40621万</td></tr><tr><td>爱迪特</td><td>631.70</td><td class="up">+20.00%</td><td>19540万</td></tr><tr><td>祥龙电业</td><td>191.60</td><td class="up">+9.99%</td><td>9442万</td></tr><tr><td>长裕集团</td><td>680.40</td><td class="up">+10.01%</td><td>14168万</td></tr><tr><td>三祥新材</td><td>874.90</td><td class="up">+9.99%</td><td>108475万</td></tr><tr><td>艾华集团</td><td>415.00</td><td class="up">+9.99%</td><td>19434万</td></tr><tr><td>通鼎互联</td><td>315.80</td><td class="up">+10.00%</td><td>162181万</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title red">📉 跌停榜 (0只)</div>
+    <table class="signal-table">
+      <thead>
+        <tr><th>股票</th><th>价格</th><th>跌幅</th></tr>
       </thead>
       <tbody>
         
@@ -247,8 +265,8 @@ body {
   </div>
 
   <div class="footer">
-    <p>A股早盘情报站 · 自动生成于 2026-06-18 01:03:33</p>
-    <p>数据: 新浪/东方财富 · 仅供参考，不构成投资建议</p>
+    <p>A股早盘情报站 v2.0 · 自动生成于 2026-06-18 03:57:33</p>
+    <p>数据: 新浪行情 / 东方财富资金流向 · 仅供参考，不构成投资建议</p>
   </div>
 
 </div>
