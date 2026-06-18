@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A股实时情报站</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+:root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1a2235;--ink:#e8ecf4;--muted:#6b7a94;--rule:#1e293b;--accent:#ef4444;--accent2:#3b82f6;--green:#22c55e;--gold:#f59e0b;--surface:rgba(255,255,255,0.04)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans SC',-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--ink);line-height:1.7;min-height:100vh}
+.container{max-width:960px;margin:0 auto;padding:16px}
+.header{background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);border:1px solid var(--rule);border-radius:12px;padding:20px 24px;margin-bottom:16px;position:relative;overflow:hidden}
+.header::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--gold),var(--accent2))}
+.header h1{font-size:20px;font-weight:700;color:#fff;line-height:1.3}
+.header .subtitle{font-size:13px;color:var(--muted);margin-top:6px}
+.header-meta{display:flex;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--muted);margin-top:10px;align-items:center}
+.header-meta span{background:var(--surface);padding:3px 10px;border-radius:20px;border:1px solid var(--rule)}
+.refresh-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px;animation:pulse 2s infinite}
+.refresh-dot.live{background:var(--green)}
+.refresh-dot.loading{background:var(--gold);animation:none}
+.refresh-dot.error{background:var(--accent);animation:none}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.score-bar{display:flex;align-items:center;gap:12px;margin-top:12px;padding:10px 14px;background:var(--surface);border-radius:8px;border:1px solid var(--rule)}
+.score-label{font-size:12px;color:var(--muted)}
+.score-track{flex:1;height:6px;background:var(--bg3);border-radius:3px;position:relative}
+.score-fill{position:absolute;top:0;bottom:0;border-radius:3px;transition:all .5s}
+.score-value{font-size:16px;font-weight:800;min-width:50px;text-align:right}
+.section{background:var(--bg2);border:1px solid var(--rule);border-radius:12px;padding:20px;margin-bottom:16px}
+.section-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:16px;padding-left:12px;border-left:3px solid var(--accent);display:flex;align-items:center;gap:8px}
+.section-title.blue{border-left-color:var(--accent2)}
+.section-title.gold{border-left-color:var(--gold)}
+.section-title.green{border-left-color:var(--green)}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.card{background:var(--bg3);border:1px solid var(--rule);border-radius:10px;padding:14px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;bottom:0;width:3px}
+.card.red::before{background:var(--accent)}
+.card.blue::before{background:var(--accent2)}
+.card.green::before{background:var(--green)}
+.card.gold::before{background:var(--gold)}
+.card-label{font-size:11px;color:var(--muted);margin-bottom:4px}
+.card-value{font-size:22px;font-weight:900;line-height:1.2}
+.card-value.red{color:var(--accent)}
+.card-value.blue{color:var(--accent2)}
+.card-value.green{color:var(--green)}
+.card-value.gold{color:var(--gold)}
+.card-note{font-size:11px;color:var(--muted);margin-top:4px}
+.sentiment-box{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.sent-item{text-align:center;background:var(--surface);border-radius:8px;padding:10px 12px;flex:1;min-width:70px}
+.sent-label{font-size:10px;color:var(--muted);margin-bottom:4px}
+.sent-val{font-size:18px;font-weight:800}
+.sent-val.red{color:var(--accent)}
+.sent-val.green{color:var(--green)}
+.sent-val.blue{color:var(--accent2)}
+.sent-val.gold{color:var(--gold)}
+.logic-item{display:flex;gap:12px;margin-bottom:14px;padding:14px;background:var(--surface);border-radius:10px;border:1px solid var(--rule)}
+.logic-num{width:28px;height:28px;min-width:28px;border-radius:50%;background:var(--accent);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.logic-num.blue{background:var(--accent2)}
+.logic-num.green{background:var(--green)}
+.logic-num.gold{background:var(--gold)}
+.logic-content h3{font-size:14px;font-weight:700;color:#fff;margin-bottom:4px}
+.logic-content p{font-size:12px;color:var(--muted);line-height:1.6}
+.signal-table{width:100%;border-collapse:collapse;font-size:12px}
+.signal-table th{background:var(--bg3);padding:10px 8px;text-align:left;font-weight:600;color:var(--muted);font-size:11px;border-bottom:1px solid var(--rule)}
+.signal-table td{padding:10px 8px;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--ink)}
+.signal-table tr:hover{background:var(--surface)}
+.signal-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.signal-badge.red{background:rgba(239,68,68,0.15);color:#fca5a5}
+.signal-badge.green{background:rgba(34,197,94,0.15);color:#86efac}
+.signal-badge.gold{background:rgba(245,158,11,0.15);color:#fcd34d}
+.signal-badge.blue{background:rgba(59,130,246,0.15);color:#93c5fd}
+.up{color:var(--accent)}
+.down{color:var(--green)}
+.footer{text-align:center;padding:20px;font-size:11px;color:var(--muted)}
+.countdown{font-size:11px;color:var(--muted);margin-left:auto}
+@media(max-width:600px){.cards{grid-template-columns:1fr}.container{padding:10px}.header h1{font-size:17px}.card-value{font-size:18px}.section{padding:14px}.sent-item{min-width:60px;padding:8px}.sent-val{font-size:15px}}
+</style>
+</head>
+<body>
+<div class="container" id="app">
+  <div class="header" id="header">
+    <h1 id="title">A股实时情报站 —— 加载中...</h1>
+    <div class="subtitle" id="subtitle">正在获取最新数据</div>
+    <div class="header-meta">
+      <span id="time"><span class="refresh-dot loading"></span>连接中...</span>
+      <span id="sentiment-tag">情绪: --</span>
+      <span>来源: 新浪/东财</span>
+      <span class="countdown" id="countdown"></span>
+    </div>
+    <div class="score-bar">
+      <span class="score-label">多空评分</span>
+      <div class="score-track"><div class="score-fill" id="score-fill"></div></div>
+      <span class="score-value" id="score-value">--</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">📊 核心数据</div>
+    <div class="cards" id="index-cards"></div>
+    <div class="sentiment-box" id="sentiment-box"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title blue">→ 市场逻辑链</div>
+    <div id="logics"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title green">🎯 交易信号</div>
+    <table class="signal-table">
+      <thead><tr><th>信号</th><th>方向</th><th>板块/标的</th><th>逻辑</th><th>置信度</th></tr></thead>
+      <tbody id="signals"></tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title gold">🔥 板块资金流向 TOP5</div>
+    <table class="signal-table">
+      <thead><tr><th>板块</th><th>涨幅</th><th>主力净流入</th></tr></thead>
+      <tbody id="sectors"></tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">📈 涨停榜 (<span id="limit-up-count">0</span>只)</div>
+    <table class="signal-table">
+      <thead><tr><th>股票</th><th>价格</th><th>涨幅</th><th>封单</th></tr></thead>
+      <tbody id="limit-up"></tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title red">📉 跌停榜 (<span id="limit-down-count">0</span>只)</div>
+    <table class="signal-table">
+      <thead><tr><th>股票</th><th>价格</th><th>跌幅</th></tr></thead>
+      <tbody id="limit-down"></tbody>
+    </table>
+  </div>
+
+  <div class="footer">
+    <p>A股实时情报站 v3.0 · 数据每5分钟自动刷新</p>
+    <p>数据: 新浪行情 / 东方财富资金流向 · 仅供参考，不构成投资建议</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  const DATA_URL = 'data.json';
+  const REFRESH_INTERVAL = 300; // 5分钟
+  let countdown = REFRESH_INTERVAL;
+  let lastData = null;
+
+  function cls(v){ return v > 0 ? 'green' : v < 0 ? 'red' : 'blue'; }
+  function sign(v){ return v >= 0 ? '+' : ''; }
+  function fmt(v,d){ return v != null ? v.toFixed(d||2) : '--'; }
+
+  function render(d){
+    // Header
+    document.getElementById('title').textContent = d.title || 'A股实时情报站';
+    document.getElementById('subtitle').textContent = d.sentiment_detail || '';
+    document.getElementById('time').innerHTML = '<span class="refresh-dot live"></span>' + d.timestamp;
+    document.getElementById('sentiment-tag').textContent = '情绪: ' + (d.sentiment || '--');
+
+    // Score bar
+    const score = d.score || 0;
+    const sc = score > 20 ? 'green' : score < -20 ? 'red' : 'blue';
+    const emoji = score > 20 ? '🟢' : score < -20 ? '🔴' : '⚪';
+    const fill = document.getElementById('score-fill');
+    if(score > 0){
+      fill.style.left = '50%';
+      fill.style.right = 'auto';
+      fill.style.width = Math.min(score,100)/2 + '%';
+    } else {
+      fill.style.right = '50%';
+      fill.style.left = 'auto';
+      fill.style.width = Math.min(Math.abs(score),100)/2 + '%';
+    }
+    fill.className = 'score-fill ' + sc;
+    const sv = document.getElementById('score-value');
+    sv.textContent = emoji + ' ' + score.toFixed(0);
+    sv.className = 'score-value ' + sc;
+
+    // Index cards
+    let cardsHtml = '';
+    (d.indices||[]).forEach(function(idx){
+      const c = cls(idx.change_pct);
+      cardsHtml += '<div class="card '+c+'"><div class="card-label">'+idx.name+'</div>'
+        +'<div class="card-value '+c+'">'+fmt(idx.price)+'</div>'
+        +'<div class="card-note">'+sign(idx.change_pct)+fmt(idx.change_pct)+'%</div></div>';
+    });
+    // Northbound card
+    const nb = d.nb_total || 0;
+    const nbc = nb > 0 ? 'green' : 'red';
+    cardsHtml += '<div class="card '+nbc+'"><div class="card-label">北向资金</div>'
+      +'<div class="card-value '+nbc+'">'+sign(nb)+fmt(nb,1)+'亿</div>'
+      +'<div class="card-note">今日'+(d.nb_direction||'--')+(d.nb_estimated?' (估算)':'')+'</div></div>';
+    document.getElementById('index-cards').innerHTML = cardsHtml;
+
+    // Sentiment box
+    const items = [
+      {label:'上证', val:d.sh_change},
+      {label:'深成指', val:d.sz_change},
+      {label:'创业板', val:d.cy_change},
+      {label:'沪深300', val:d.hs300_change},
+      {label:'中证500', val:d.zz500_change},
+      {label:'涨停/跌停', val:null, text:(d.limit_up_count||0)+'/'+(d.limit_down_count||0), tc: (d.limit_up_count||0)>(d.limit_down_count||0)*3?'green':'red'}
+    ];
+    let sentHtml = '';
+    items.forEach(function(it){
+      if(it.val != null){
+        sentHtml += '<div class="sent-item"><div class="sent-label">'+it.label+'</div>'
+          +'<div class="sent-val '+cls(it.val)+'">'+sign(it.val)+fmt(it.val)+'%</div></div>';
+      } else {
+        sentHtml += '<div class="sent-item"><div class="sent-label">'+it.label+'</div>'
+          +'<div class="sent-val '+(it.tc||'blue')+'">'+it.text+'</div></div>';
+      }
+    });
+    document.getElementById('sentiment-box').innerHTML = sentHtml;
+
+    // Logics
+    let logHtml = '';
+    (d.logics||[]).forEach(function(l){
+      logHtml += '<div class="logic-item"><div class="logic-num '+l.color+'">'+l.num+'</div>'
+        +'<div class="logic-content"><h3>'+l.title+'</h3><p>'+l.content+'</p></div></div>';
+    });
+    document.getElementById('logics').innerHTML = logHtml;
+
+    // Signals
+    let sigHtml = '';
+    (d.signals||[]).forEach(function(s){
+      sigHtml += '<tr><td><strong>'+s.name+'</strong></td>'
+        +'<td><span class="signal-badge '+s.badge+'">'+s.direction+'</span></td>'
+        +'<td>'+s.target+'</td><td>'+s.logic+'</td>'
+        +'<td><span class="signal-badge '+s.conf_badge+'">'+s.confidence+'</span></td></tr>';
+    });
+    document.getElementById('signals').innerHTML = sigHtml;
+
+    // Sectors
+    let secHtml = '';
+    (d.sectors||[]).slice(0,5).forEach(function(s){
+      const c = s.change_pct > 0 ? 'up' : 'down';
+      secHtml += '<tr><td>'+s.name+'</td><td class="'+c+'">'+sign(s.change_pct)+fmt(s.change_pct)+'%</td>'
+        +'<td>'+fmt(s.main_net/10000,1)+'亿</td></tr>';
+    });
+    document.getElementById('sectors').innerHTML = secHtml;
+
+    // Limit up
+    document.getElementById('limit-up-count').textContent = d.limit_up_count || 0;
+    let luHtml = '';
+    (d.limit_up||[]).slice(0,10).forEach(function(s){
+      luHtml += '<tr><td>'+s.name+'</td><td>'+fmt(s.price)+'</td>'
+        +'<td class="up">+'+fmt(s.change_pct)+'%</td>'
+        +'<td>'+fmt(s['封单金额']/10000,0)+'万</td></tr>';
+    });
+    document.getElementById('limit-up').innerHTML = luHtml;
+
+    // Limit down
+    document.getElementById('limit-down-count').textContent = d.limit_down_count || 0;
+    let ldHtml = '';
+    (d.limit_down||[]).slice(0,5).forEach(function(s){
+      ldHtml += '<tr><td>'+s.name+'</td><td>'+fmt(s.price)+'</td>'
+        +'<td class="down">'+fmt(s.change_pct)+'%</td></tr>';
+    });
+    document.getElementById('limit-down').innerHTML = ldHtml;
+  }
+
+  async function fetchData(){
+    const dot = document.querySelector('.refresh-dot');
+    if(dot) dot.className = 'refresh-dot loading';
+    try {
+      const resp = await fetch(DATA_URL + '?t=' + Date.now());
+      if(!resp.ok) throw new Error('HTTP ' + resp.status);
+      const data = await resp.json();
+      lastData = data;
+      render(data);
+      if(dot) dot.className = 'refresh-dot live';
+      countdown = REFRESH_INTERVAL;
+    } catch(e){
+      console.error('数据获取失败:', e);
+      if(dot) dot.className = 'refresh-dot error';
+      // If we have cached data, keep showing it
+      if(!lastData){
+        document.getElementById('title').textContent = 'A股实时情报站 —— 数据加载失败';
+        document.getElementById('subtitle').textContent = '请检查网络连接，页面将自动重试';
+      }
+    }
+  }
+
+  // Countdown display
+  setInterval(function(){
+    countdown--;
+    if(countdown <= 0){
+      fetchData();
+    }
+    const m = Math.floor(countdown / 60);
+    const s = countdown % 60;
+    document.getElementById('countdown').textContent = (m > 0 ? m + '分' : '') + s + '秒后刷新';
+  }, 1000);
+
+  // Initial load
+  fetchData();
+})();
+</script>
+</body>
+</html>
